@@ -22,8 +22,6 @@ observeEvent(input$run, {
       ffpath <- paste0(input$pathImages, ff)
     }
     
-
-    
     session$userData$listimages <- data.frame(name = ff, datapath=ffpath, havemom = logical(length = length(ffpath)))
     
     session$userData$imageFiles <- session$userData$listimages[1,]
@@ -55,9 +53,7 @@ gestion_image <- function(images) {
     if(os == "linux") {
       newdir <- "./www/images/tmp"
       realPath <-  "./images/tmp"
-      
-      
-      
+    
     } else if(os == "osx") {
       newdir <- "www/images/tmp"      # not sure but I think it should be www/images/tmp
       realPath <-  "images/tmp"
@@ -112,9 +108,7 @@ observeEvent(input$loadI, {
 observeEvent(input$nextI, {
   
   if(!is.null(session$userData$listimages)) {
-    
     session$sendCustomMessage(type = 'end', message = "next")
-
   }
 
 })
@@ -124,9 +118,7 @@ observeEvent(input$nextI, {
 observeEvent(input$saveI, {
   
   if(!is.null(session$userData$listimages)) {
-    
     session$sendCustomMessage(type = 'end', message = "save")
-    
   }
   
 })
@@ -136,9 +128,7 @@ observeEvent(input$saveI, {
 observeEvent(input$previousI, {
 
   if(!is.null(session$userData$listimages)) {
-    
     session$sendCustomMessage(type = 'end', message = "previous")
-    
   }
   
 })
@@ -148,9 +138,7 @@ observeEvent(input$previousI, {
 observeEvent(input$firstI, {
   
   if(!is.null(session$userData$listimages)) {
-    
     session$sendCustomMessage(type = 'end', message = "first")
-
   }
   
 })
@@ -270,71 +258,6 @@ loadYamlFile <- function(yaml_file) {
 
 #====================================================================================
 
-round3 <- function(x) {
-  return(round(x, 3))
-}
-
-segmentIsPolygon <- function(size, arraySegments) {
-  
-  if(size <= 2) {
-    return(FALSE)
-  }
-  
-  firstP = arraySegments[[1]]$p1
-  lastP = arraySegments[[size]]$p2
-  
-  if(firstP$id == lastP$id) {
-    return(TRUE)
-  }
-  
-  lastlastP = arraySegments[[size-1]]$p2
-  
-  if(lastlastP$x == lastP$x) {
-    if(lastlastP$y == lastP$y) {
-      arraySegments[[size]]$p2$x = firstP$x
-      arraySegments[[size]]$p2$x = firstP$y
-      return(TRUE)
-    }
-  }
-  
-  return(FALSE)
-}
-
-segmentIsLineString <- function(size, arraySegments) {
-  if(size < 1) {
-    return(FALSE)
-  }
-  
-  if(size == 1) {
-    return(TRUE)
-  }
-  
-  firstP = arraySegments[[1]]$p1
-  lastP = arraySegments[[size]]$p2
-  lastlastP = arraySegments[[size-1]]$p2
-
-  if(firstP$id != lastP$id) {
-    if(lastlastP$x != lastP$x) {
-      if(lastlastP$y != lastP$y) {
-        return(TRUE)
-      }
-    }
-  }
-  
-  return(FALSE) 
-}
-
-curveIsPolygon <- function(type) {
-  return(input$endImage$typeofcurve == "close")
-}
-
-curveIsLineString <- function(type) {
-  return(input$endImage$typeofcurve == "open")
-}
-
-
-#====================================================================================
-
 saveYamlFile <- function (images, input, result) {
   
   if(file.exists(result)) {
@@ -349,161 +272,15 @@ saveYamlFile <- function (images, input, result) {
   imagesName <- toString(images$name)
   
   txt <- paste0('result:\n')
-  
   txt <- paste0(txt, '  name: "', imagesName, '"\n')
   txt <- paste0(txt, '  path: "', imagesPath, '"\n')
+  txt <- paste0(txt, input$endImage$partitions$YML)
   
-  
-  
-  if(input$endImage$indexPoint2D > 0) {
-    txt = paste0(txt, '  MultiPoint: [', '\n')
-    for (i in 1:input$endImage$indexPoint2D){
-      p = input$endImage$arrayPoint2D[[i]]
-      if(i < input$endImage$indexPoint2D) {
-        txt = paste0(txt, '[', round3(p$x), ', ', round3(p$y), '], ')
-      } else {
-        txt = paste0(txt, '[', round3(p$x), ', ', round3(p$y), ']\n')
-      }
-    }
-    txt = paste0(txt, '  ]', '\n')
-  } else {
-    txt = paste0(txt, '  MultiPoint: []', '\n')
-  }
-
-    txt = paste0(txt, '  MultiLineString: [', '\n')
-  
-    sizeS = input$endImage$indexSegment2D
-    if(segmentIsLineString(sizeS, input$endImage$arraySegment2D)) {
-      txt = paste0(txt, '[\n[')
-      
-      for (i in 1:sizeS){
-        s = input$endImage$arraySegment2D[[i]]
-        if(i == 1) {
-          txt = paste0(txt, '[', round3(s$p1$x),  ", ", round3(s$p1$y), "]")
-        }
-        
-        txt = paste0(txt,', [', round3(s$p2$x),  ", ", round3(s$p2$y), "]")
-      }
-      txt = paste0(txt, ']\n]\n')
-    }
-    
-    
-      
-      if(curveIsLineString(input$endImage$typeofcurve)) {
-        sizeC = input$endImage$curve$size
-          if(sizeC > 0) {
-            if(segmentIsLineString(sizeS, input$endImage$arraySegment2D)) {
-            txt = paste0(txt, ',\n[\n[')
-            } else {
-              txt = paste0(txt, '[\n[')
-            }
-            for (i in 1:sizeC){
-              p = input$endImage$curve$points[[i]]
-              if(i == 1) {
-                txt = paste0(txt, "[", round3(p$x), ", ", round3(p$y), "]")
-              } else {
-                txt = paste0(txt, ", [", round3(p$x), ", ", round3(p$y), "]")
-              }
-              
-            }
-            txt = paste0(txt, '],\n  [')
-            index = 1
-            sizeCA = length(input$endImage$curve$allpts)
-            position = 1
-            for(x in input$endImage$curve$allpts) {
-              if(index == 2) {
-                if(position == sizeCA) {
-                  txt = paste0(txt, round3(x), "]")
-                } else {
-                  txt = paste0(txt, round3(x), "], ")
-                }
-                
-                index = 0
-              } else {
-                txt = paste0(txt, "[", round3(x), ", ")
-              }
-              index = index + 1
-              position = position + 1
-            }
-            txt = paste0(txt, '  ]\n]')
-        }
-      } else {
-        txt = paste0(txt, '\n')
-      }
-      
-    
-    txt = paste0(txt, '\n]', '\n')
-    
-    txt = paste0(txt, '  MultiPolygon: [', '\n')
-    
-    if(segmentIsPolygon(sizeS, input$endImage$arraySegment2D)) {
-      txt = paste0(txt, '[\n[')
-      for (i in 1:sizeS){
-        s = input$endImage$arraySegment2D[[i]]
-        if(i == 1) {
-          txt = paste0(txt, '[', round3(s$p1$x),  ", ", round3(s$p1$y), "]")
-        }
-        
-        txt = paste0(txt,', [', round3(s$p2$x),  ", ", round3(s$p2$y), "]")
-      }
-      txt = paste0(txt, ']]', '\n')
-    }
-    
-    if(curveIsPolygon(input$endImage$typeofcurve)) {
-      sizeC = input$endImage$curve$size
-      if(sizeC > 0) {
-        if(segmentIsPolygon(sizeS, input$endImage$arraySegment2D)) {
-          txt = paste0(txt, ',\n[\n[')
-        } else {
-          txt = paste0(txt, '[\n[')
-        }
-        for (i in 1:sizeC){
-          p = input$endImage$curve$points[[i]]
-          if(i == 1) {
-            txt = paste0(txt, "[", round3(p$x), ", ", round3(p$y), "]")
-          } else {
-            txt = paste0(txt, ", [", round3(p$x), ", ", round3(p$y), "]")
-          }
-          
-        }
-        txt = paste0(txt, '],\n  [')
-        index = 1
-        sizeCA = length(input$endImage$curve$allpts)
-        position = 1
-        for(x in input$endImage$curve$allpts) {
-          if(index == 2) {
-            if(position == sizeCA) {
-              txt = paste0(txt, round3(x), "]")
-            } else {
-              txt = paste0(txt, round3(x), "], ")
-            }
-            
-            index = 0
-          } else {
-            txt = paste0(txt, "[", round3(x), ", ")
-          }
-          index = index + 1
-          position = position + 1
-        }
-        txt = paste0(txt, '  ]\n]')
-      }
-    } else {
-      txt = paste0(txt, '\n')
-    }
-    
-    
-    txt = paste0(txt, '    ]', '\n')
-    
-    txt = paste0(txt, "\n")
-    
   writeLines(txt, fileConn)
-  
   close(fileConn)
 }
 
 #====================================================================================
-
-
 
 saveMomFile <- function (images, input, result) {
   
@@ -520,75 +297,10 @@ saveMomFile <- function (images, input, result) {
   
   txt <- paste0("#Name ", imagesName, "\n")
   txt <- paste0(txt, "#Path ", imagesPath, "\n")
-  
-  sizeP = input$endImage$indexPoint2D
-  if(sizeP > 0) {
-    if(sizeP == 1) {
-      txt = paste0(txt, "#Point", "\n")
-    } else {
-      txt = paste0(txt, "#MultiPoint", "\n")
-    }
-    for (i in 1:sizeP){
-      p = input$endImage$arrayPoint2D[[i]]
-      txt = paste0(txt, "", round3(p$x), " ", round3(p$y), "\n")
-    }
-  }
-  
-  sizeS = input$endImage$indexSegment2D
-  if(sizeS > 0) {
-    firstP = input$endImage$arraySegment2D[[1]]$p1
-    lastP = input$endImage$arraySegment2D[[sizeS]]$p2
-    
-    if(firstP$id == lastP$id) {
-      txt = paste0(txt, "#Polygon", "\n")
-    } else {
-      txt = paste0(txt, "#LineString", "\n")
-    }
-    
-    for (i in 1:sizeS){
-      s = input$endImage$arraySegment2D[[i]]
-      if(i == 1) {
-        txt = paste0(txt, round3(s$p1$x),  " ", round3(s$p1$y), "\n")
-      }
-        
-      txt = paste0(txt, round3(s$p2$x),  " ", round3(s$p2$y), "\n")
-    }
-  }
-  
-  sizeC = input$endImage$curve$size
-  if(sizeC > 0) {
-    
-    if(input$endImage$typeofcurve == "open") {
-      txt = paste0(txt, "#LineString\n")
-    } else { #close normaly
-      txt = paste0(txt, "#Polygon\n")
-    }
-    
-    #for (i in 1:sizeC){
-    #  p = input$endImage$curve$points[[i]]
-    #  txt = paste0(txt, "Point2D - {id:  ", p$id, "; x: ", round3(p$x), "; y:", round3(p$y), "}\n")
-    #}
-    
-    index = 1
-    for(x in input$endImage$curve$allpts) {
-      if(index == 2) {
-        txt = paste0(txt, round3(x), "\n")
-        index = 0
-      } else {
-        txt = paste0(txt, round3(x), " ")
-      }
-      index = index + 1
-    }
-    
-    txt = paste0(txt, "\n")
-    
-    
-  }
+  txt <- paste0(txt, input$endImage$partitions$MOM)
   
   writeLines(txt, fileConn)
-  
   close(fileConn)
-  
 }
 
 #====================================================================================
@@ -676,8 +388,6 @@ observeEvent(input$endImage, {
         
         session$sendCustomMessage(type = 'index',
                                   message = index)
-        
-
         
         images <- session$userData$imageFiles
         

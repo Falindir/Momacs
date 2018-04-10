@@ -33,6 +33,8 @@ Shiny.addCustomMessageHandler("end",
         alert("Please, load image before run");
     } else {
        canvas.typeevent = message;
+       zone.save();
+       canvas.partitions = zone;
        Shiny.onInputChange("endImage", canvas);
     }
   }
@@ -41,15 +43,7 @@ Shiny.addCustomMessageHandler("end",
 Shiny.addCustomMessageHandler("load",
   function(message) {
     if(canvas.started) {
-
-        canvas.indexPoint2D = 0;
-        canvas.arrayPoint2D = [];
-        canvas.indexSegment2D = 0;
-        canvas.arraySegment2D = [];
-        canvas.firstSegment = true;
-        canvas.curve.size = 0;
-        canvas.curve.points = [];
-
+        canvas.newEnv();
         canvas.loadCanvas(message);
         canvas.redraw();
     }
@@ -60,15 +54,7 @@ Shiny.addCustomMessageHandler("load",
 Shiny.addCustomMessageHandler("new",
   function(message) {
     if(canvas.started) {
-
-        canvas.indexPoint2D = 0;
-        canvas.arrayPoint2D = [];
-        canvas.indexSegment2D = 0;
-        canvas.arraySegment2D = [];
-        canvas.firstSegment = true;
-        canvas.curve.size = 0;
-        canvas.curve.points = [];
-        
+        canvas.newEnv();
         canvas.redraw();
     }
   }

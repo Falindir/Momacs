@@ -42,9 +42,6 @@ tabHome = fluidPage(
   actionButton("clearImage", "", icon("eraser"), class="btn btn-success"),
   bsTooltip("clearImage", "Clear image", placement = "top", trigger = "hover", options = NULL),
   
-  actionButton("deleteLastElement", "last", icon("trash"), class="btn btn-success"),
-  bsTooltip("deleteLastElement", "Delete last element", placement = "top", trigger = "hover",  options = NULL),     
-  
   br(), br(),
   
   fluidRow(

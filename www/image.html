@@ -18,40 +18,10 @@ canvas.pointSize = momacs_config.size_point + momacs_config.size_hover;
 canvas.lastX=canvas.width/2;
 canvas.lastY=canvas.height/2;
 canvas.currentScale = 1;
-canvas.dragStart = null;
 canvas.imagePath = "";
 canvas.typeofcurve = "close";
-canvas.typeevent = "";
 
-canvas.idPoint = 0;
-
-canvas.indexPoint2D = 0;
-canvas.arrayPoint2D = [];
-
-canvas.indexSegment2D = 0;
-canvas.arraySegment2D = [];
-canvas.firstSegment = true;
-canvas.newA = null;
-canvas.newB = null;
-
-canvas.curve = null;
-canvas.newCA = null;
-canvas.newCB = null;
-
-canvas.draggedPoint = null;
-
-canvas.pointsPartition = [];
-canvas.segmentsPartition = [];
-canvas.curvesPartition = [];
-
-canvas.sizePointsPartition = 0;
-canvas.sizeSegmentsPartition = 0;
-canvas.sizeCurvesPartition = 0;
-
-canvas.currentPointPartiton = 0;
-canvas.currentSegmentPartiton = 0;
-canvas.currentCurvePartiton = 0;
-
+var zone = null;
 var ctx = null;
 var ima1 = null;
 
@@ -61,280 +31,35 @@ document.body.style.mozUserSelect = document.body.style.webkitUserSelect = docum
           
 ctx = canvas.getContext('2d');
 trackTransforms(ctx);
-canvas.curve = new Curve2D(0);
 
-canvas.pointsPartition[0] = new Partition(0);
-canvas.segmentsPartition[0] = new Partition(0);
-canvas.curvesPartition[0] = new Curve2D(0);
+zone = new ZoneP();
 
 //===========================================================================
 
 canvas.addEventListener('click',function(evt)
 {
   if(canvas.started) {
-        var pt = this.getPosition(evt);
-        if(canvas.state == "drawPoint") {
-            this.drawCoordinates(pt.x,pt.y);
-            var point = new Point2D(this.idPoint, pt.x, pt.y);
-            this.arrayPoint2D.push(point);
-            this.indexPoint2D++;
-            this.idPoint++;
-        } else if(canvas.state == "drawSegment") {
-            this.drawCoordinates(pt.x,pt.y);
-            var p = new Point2D(this.idPoint, pt.x, pt.y);
-            this.idPoint++;
-            if(this.firstSegment) {
-               if(this.indexSegment2D == 0) {
-                  var s = new Segment2D(this.indexSegment2D, p, null);
-                  this.arraySegment2D.push(s);
-                  this.indexSegment2D++;
-               } else {
-                  this.arraySegment2D[this.indexSegment2D - 1].p2 = p;
-                  this.drawLine(this.arraySegment2D[this.indexSegment2D - 1].p1, p);
-                  this.firstSegment = false;
-               }
-            } else {
-              var lastp = this.arraySegment2D[this.indexSegment2D - 1].p2;
-              var s = new Segment2D(this.indexSegment2D, lastp, p);
-              this.drawLine(lastp, p);
-              this.arraySegment2D.push(s);
-              this.indexSegment2D++;
-            }
-        } else if(canvas.state == "drawCurve") {
-            var p = new Point2D(this.idPoint, pt.x, pt.y);
-            this.idPoint++;
-            this.curve.points.push(p);
-            this.curve.size++;
-            this.redraw();
-        } else if(canvas.state == "deletePoint") {
-            var point = new Point2D(0, pt.x, pt.y);
-            var indexToDelete = null;
-            for (var i = 0; i < this.indexPoint2D; i++) {
-                var d = this.distance(point, this.arrayPoint2D[i]);
-                if(d <= this.pointSize) {
-                   indexToDelete = i;
-                   break;
-                }
-            }
-            if(indexToDelete != null) { //we found à point to delete
-                var newPoints = [];
-                for (var i = 0; i < this.indexPoint2D; i++) {
-                  if(i != indexToDelete){
-                     newPoints.push(this.arrayPoint2D[i]);
-                  }
-                }
-                this.arrayPoint2D = newPoints;
-                this.indexPoint2D--;
-            }
-            this.redraw();
-        } else if(canvas.state == "deletePointSegment") {
-            var point = new Point2D(0, pt.x, pt.y);
-            var indexToDelete = null;
-            var pToDelete = null;
-            for (var i = 0; i < this.indexSegment2D; i++) {
-                var d1 = this.distance(point, this.arraySegment2D[i].p1);
-                var d2 = this.distance(point, this.arraySegment2D[i].p2);
-                if(d1 <= this.pointSize) {
-                   indexToDelete = i;
-                   pToDelete = 1;
-                   break;
-                } else if(d2 <= this.pointSize) {
-                   indexToDelete = i;
-                   pToDelete = 2;
-                   break;
-                }
-            }
-            if(indexToDelete != null) { //we found à point to delete
-              
-            
-               var newSegments = [];
-               if(indexToDelete == 0 && pToDelete == 1) { //cas particulier de 1er
-                  for (var i = 1; i < this.indexSegment2D; i++) {
-                    newSegments.push(this.arraySegment2D[i]);
-                  }
-                  this.arraySegment2D = newSegments;
-                  this.indexSegment2D--;
-               } else if(indexToDelete == this.indexSegment2D - 1 && pToDelete == 2) { //cas particulier du dernier
-                    for (var i = 0; i < this.indexSegment2D - 1; i++) {
-                        newSegments.push(this.arraySegment2D[i]);
-                    }
-                  this.arraySegment2D = newSegments;
-                  this.indexSegment2D--;
-               } else { 
-                  for (var i = 0; i < this.indexSegment2D; i++) {
-                    if(indexToDelete == i) {
-                        //normalement c toujour p2
-                         var old = this.arraySegment2D[i];
-                         var old2 = this.arraySegment2D[i+1];
-                         var p1 = new Point2D(old.p1.id, old.p1.x, old.p1.y);
-                         var p2 = new Point2D(old2.p2.id, old2.p2.x, old2.p2.y);
-                         var newss = new Segment2D(old.id, p1, p2);
-                         newSegments.push(newss);
-                    } else {
-                       if(indexToDelete+1 == i) {
-                          //nothing to do                         
-                       } else {
-                          newSegments.push(this.arraySegment2D[i]);
-                       }
-                    }
-                  }
-                  this.arraySegment2D = newSegments;
-                  this.indexSegment2D--;
-               }
-            }
-            
-            if(this.indexSegment2D == 0) {
-              canvas.firstSegment = true;
-            }
-            
-            this.redraw();
-        } else if(canvas.state == "deletePointCurve") {
-            var point = new Point2D(0, pt.x, pt.y);
-            var indexToDelete = null;
-            for (var i = 0; i < this.curve.size; i++) {
-                var d = this.distance(point, this.curve.points[i]);
-                if(d <= this.pointSize) {
-                   indexToDelete = i;
-                   break;
-                }
-            }
-            
-             if(indexToDelete != null) {
-                 
-                  var newPoints = [];
-          
-                  for (var i = 0; i < this.curve.size; i++) {
-                      if(i != indexToDelete){
-                          newPoints.push(this.curve.points[i]);
-                      }
-                  }
-                  this.curve.points = newPoints;
-                  this.curve.size--;
-                
-            }
-            
-            
-          this.redraw();
-        } else if(canvas.state == "addPointOnSegment") {
-          var point = new Point2D(this.idPoint, pt.x, pt.y);
-            if(canvas.newA == null) {
-              for (var i = 0; i < this.indexSegment2D; i++) {
-                var d1 = this.distance(point, this.arraySegment2D[i].p1);
-                var d2 = this.distance(point, this.arraySegment2D[i].p2);
-                if(d1 <= this.pointSize) {
-                   canvas.newA = this.arraySegment2D[i].p1;
-                   break;
-                } else if(d2 <= this.pointSize) {
-                   canvas.newA = this.arraySegment2D[i].p2;
-                   break;
-                }
-              }
-            } else if(canvas.newB == null) {
-              for (var i = 0; i < this.indexSegment2D; i++) {
-                var d1 = this.distance(point, this.arraySegment2D[i].p1);
-                var d2 = this.distance(point, this.arraySegment2D[i].p2);
-                if(d1 <= this.pointSize) {
-                   canvas.newB = this.arraySegment2D[i].p1;
-                   break;
-                } else if(d2 <= this.pointSize) {
-                   canvas.newB = this.arraySegment2D[i].p2;
-                   break;
-                }
-              }
-              
-              if(canvas.newB == null) {
-                canvas.newB = point; //segment with new point
-                this.idPoint++;
-              }
-            
-              var s = new Segment2D(this.indexSegment2D, canvas.newA, canvas.newB);
-              this.arraySegment2D.push(s);
-              this.indexSegment2D++;
-              this.redraw();
-              canvas.newA = null;
-              canvas.newB = null;
-             
-            }
-        } else if(canvas.state == "addPointOnCurve") {
-           var point = new Point2D(this.idPoint, pt.x, pt.y);
-           if(canvas.newCA == null) {
-             
-            for (var i = 0; i < this.curve.size; i++) {
-                var d = this.distance(point, this.curve.points[i]);
-                if(d <= this.pointSize) {
-                   canvas.newCA = this.curve.points[i];
-                   break;
-                }
-            }
-             
-             
-           } else if(canvas.newCB == null) {
-                for (var i = 0; i < this.curve.size; i++) {
-                    var d = this.distance(point, this.curve.points[i]);
-                    if(d <= this.pointSize) {
-                       canvas.newCB = this.curve.points[i];
-                       break;
-                    }
-                }
-                if(canvas.newCB != null) { //we found other point
-                    var newPoint = [];
-                    
-                    //for find max in tree
-                    var indexA = 0;
-                    var indexB = 0;
-                    for (var i = 0; i < this.curve.size; i++) {
-                      if(this.curve.points[i].id == canvas.newCA.id) {
-                        indexA = i;
-                      }
-                      
-                      if(this.curve.points[i].id == canvas.newCB.id) {
-                        indexB = i;
-                      }
-                    }
-                     
-                    var rid = this.curve.points[Math.max(indexA, indexB)].id;
-                    
-                    var nx = (canvas.newCA.x + canvas.newCB.x) / 2;
-                    var ny = (canvas.newCA.y + canvas.newCB.y) / 2;
-                    var p = new Point2D(this.idPoint, nx, ny);
-                    var lastid = this.curve.points[this.curve.size - 1].id;
-                    var firstid = this.curve.points[0].id;
-                    
-                    if(canvas.newCA.id == lastid && canvas.newCB.id == firstid) {
-                        for (var i = 0; i < this.curve.size; i++) {
-                           newPoint.push(this.curve.points[i]);
-                        }
-                       newPoint.push(p); 
-                       this.idPoint++;
-                     } else if (canvas.newCA.id == firstid && canvas.newCB.id == lastid) {
-                        for (var i = 0; i < this.curve.size; i++) {
-                           newPoint.push(this.curve.points[i]);
-                        }
-                       newPoint.push(p); 
-                       this.idPoint++;
-                     } else {
-                      for (var i = 0; i < this.curve.size; i++) {
-      
-                        if(this.curve.points[i].id == rid) {
-          
-                               newPoint.push(p); //on l'add juste avant
-                               this.idPoint++;
-                                newPoint.push(this.curve.points[i]);
-                        } else {
-                          newPoint.push(this.curve.points[i]);
-                        }
-                    }
-                      
-                    }
-                    this.curve.points = newPoint;
-                    this.curve.size++;
-                    this.redraw();
-                    canvas.newCA = null;
-                    canvas.newCB = null;
-                }
-           }
-        }
-  
+      var pt = this.getPosition(evt);
+    
+      if(canvas.state == "drawPoint") {
+          zone.addPoint(pt);
+      } else if(canvas.state == "drawSegment") {
+          zone.addSegment(pt);
+      } else if(canvas.state == "drawCurve") {
+          zone.addCurve(pt);
+      } else if(canvas.state == "deletePoint") {
+          zone.deletePoint(pt);
+      } else if(canvas.state == "deletePointSegment") {
+          zone.deleteSegment(pt);
+      } else if(canvas.state == "deletePointCurve") {
+          zone.deleteCurve(pt);
+      } else if(canvas.state == "addPointOnSegment") {
+          zone.addPoinSegment(pt);
+      } else if(canvas.state == "addPointOnCurve") {
+          zone.addPointCurve(pt);
+      }
+    
+     this.redraw();
   }
 },false);
 
@@ -345,46 +70,14 @@ canvas.addEventListener('mousedown',function(evt)
   if(canvas.started) {
     var pt = this.getPosition(evt);
     if(canvas.state == "move") {
-        this.dragStart = pt;
+        zone.dragStart = pt;
+    } else if(this.state == "movePoint") {
+        zone.movePoint(pt);
+    } else if(this.state == "movePointSegment") {
+        zone.moveSegment(pt);
+    } else if(this.state == "movePointCurve") {
+        zone.moveCurve(pt);
     }
-    
-    if(this.state == "movePoint") {
-        var point = new Point2D(0, pt.x, pt.y);
-        for (var i = 0; i < this.indexPoint2D; i++) {
-            var d = this.distance(point, this.arrayPoint2D[i]);
-            if(d <= this.pointSize) {
-                 this.draggedPoint = this.arrayPoint2D[i];
-                 break;
-            }
-        }
-    }
-    
-    if(this.state == "movePointSegment") {
-      var point = new Point2D(0, pt.x, pt.y);
-      for (var i = 0; i < this.indexSegment2D; i++) {
-                var d1 = this.distance(point, this.arraySegment2D[i].p1);
-                var d2 = this.distance(point, this.arraySegment2D[i].p2);
-                if(d1 <= this.pointSize) {
-                   this.draggedPoint = this.arraySegment2D[i].p1;
-                   break;
-                } else if(d2 <= this.pointSize) {
-                   this.draggedPoint = this.arraySegment2D[i].p2;
-                   break;
-                }
-      }
-    }
-    
-    if(this.state == "movePointCurve") {
-        var point = new Point2D(0, pt.x, pt.y);
-        for (var i = 0; i < this.curve.size; i++) {
-               var d = this.distance(point, this.curve.points[i]);
-               if(d <= this.pointSize) {
-                 this.draggedPoint = this.curve.points[i];
-                 break;
-              }
-          }
-    }
-    
   }
 },false);
 
@@ -394,11 +87,11 @@ canvas.addEventListener('mouseup',function(evt)
 {
   if(this.started) {
     if(this.state == "move") {
-        this.dragStart = null;
+        zone.dragStart = null;
     }
     
     if(this.state == "movePoint" || this.state == "movePointSegment" || this.state == "movePointCurve") {
-        this.draggedPoint = null;
+        zone.draggedPoint = null;
     }
   }
 },false);
@@ -409,11 +102,10 @@ canvas.addEventListener('mouseleave',function(evt)
 {
   if(this.started) {
     if(this.state == "move") {
-        this.dragStart = null;
+        zone.dragStart = null;
     }
-    
     if(this.state == "movePoint" || this.state == "movePointSegment" || this.state == "movePointCurve") {
-        this.draggedPoint = null;
+        zone.draggedPoint = null;
     }
   }
 },false);
@@ -421,48 +113,24 @@ canvas.addEventListener('mouseleave',function(evt)
 //===========================================================================
 
 canvas.addEventListener('mousemove',function(evt){
-  
     if(canvas.started) {
         var pt = this.getPosition(evt);
         if(canvas.state == "move") {
-              if (this.dragStart){
-                
-                ctx.translate(pt.x-this.dragStart.x,pt.y-this.dragStart.y);
+              if (zone.dragStart){
+                ctx.translate(pt.x-zone.dragStart.x,pt.y-zone.dragStart.y);
                 this.redraw();
               }
         } else  if(this.state == "movePoint" || this.state == "movePointSegment"|| this.state == "movePointCurve") {
-           if(this.draggedPoint) {
-              this.draggedPoint.x = pt.x;
-              this.draggedPoint.y = pt.y;
+           if(zone.draggedPoint) {
+              zone.draggedPoint.x = pt.x;
+              zone.draggedPoint.y = pt.y;
               this.redraw();
            }
         } else  {
-          
           this.redraw();
-          
         }
-        
-        
     }
 },false);
-
-//===========================================================================
-
-canvas.distance = function (p1, p2) {
-  return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
-}
-
-//===========================================================================
-
-canvas.distanceSegment = function(s, p) {
-    var a = s.p1;
-    var b = s.p2;
-    var n = this.minus(b, a);
-    var pa = this.minus(a, p);
-    var c = this.mult(n , (this.dot( n, pa ) / this.dot( n, n )));
-    var d = this.minus(pa - c);
-    return d;
-}
 
 //===========================================================================
 
@@ -485,18 +153,11 @@ canvas.drawCoordinates = function (x,y) {
 //===========================================================================
 
 canvas.drawText = function(value, x, y) {
-  ctx.fillStyle = momacs_config.color_text; // dark blue color
+    ctx.fillStyle = momacs_config.color_text; // dark blue color
     ctx.beginPath(); //Start path
     ctx.font = momacs_config.size_text+"px Arial";
     ctx.fillText(value, x+5, y);
     ctx.fill(); // Close the path and fill.
-}
-
-//===========================================================================
-
-canvas.drawPoint = function(value, x, y) {
-  this.drawCoordinates(x, y);
-  this.drawText(value, x, y);
 }
 
 //===========================================================================
@@ -513,62 +174,24 @@ canvas.drawLine = function (p1, p2) {
 
 //===========================================================================
 
-canvas.drawBezier = function (points) {
+canvas.drawBezier = function (id, points) {
    if(points.length == 0) {
      return;
    }
    
    var pts = [];
-  
-   var j = 0;
    for (var i = 0; i < points.length; i++) {
-     pts[j] = points[i].x;
-     pts[j+1] = points[i].y;
-     j += 2;
-     this.drawCoordinates(points[i].x,points[i].y);
-     this.drawText("C0-"+i, points[i].x, points[i].y);
+     pts.push(points[i].x);
+     pts.push(points[i].y);
+     points[i].draw("C"+id+"-"+i);
    }
 
   ctx.beginPath();
   ctx.moveTo(pts[0], pts[1]);
-	this.curve.allpts = ctx.curve(pts, 0.5, 20, (this.typeofcurve == "close"));
+  zone.curvesPartition[id].allpts = ctx.curve(pts, 0.5, 20, (this.typeofcurve == "close"));
 	ctx.lineWidth = momacs_config.size_curve;
 	ctx.strokeStyle = momacs_config.color_curve;
 	ctx.stroke();
-}
-
-//===========================================================================
-
-canvas.gradient = function (a, b) 
-{
-    return (b.y-a.y)/(b.x-a.x);
-}
-
-//===========================================================================
-
-canvas.dot = function (a, b)
-{
-    return a.x * b.x + a.y * b.y;
-}
-
-//===========================================================================
-
-canvas.minus = function (a, b)
-{
-  var v = new Point2D(0, 0, 0);
-  v.x = a.x - b.x;
-  v.y = a.y - b.y;
-  return v;
-}
-
-//===========================================================================
-
-canvas.mult = function (a, v) 
-{
-  var v = new Point2D(0, 0, 0);
-  v.x = a.x * v;
-  v.y = a.y * v;
-  return v;
 }
 
 //===========================================================================
@@ -614,59 +237,19 @@ canvas.addEventListener('mousewheel',handleScroll,false);
 
 //===========================================================================
 
-canvas.redraw = function (){
-
-          // Clear the entire canvas
+canvas.redraw = function ()
+{
           var p1 = ctx.transformedPoint(0,0);
           var p2 = ctx.transformedPoint(this.width,this.height);
           ctx.clearRect(p1.x,p1.y,p2.x-p1.x,p2.y-p1.y);
-
           ctx.save();
           ctx.setTransform(1,0,0,1,0,0);
           ctx.clearRect(0,0,this.width,this.height);
           ctx.restore();
-
           ctx.drawImage(ima1,0,0);
-        
-          for (var i = 0; i < this.indexPoint2D; i++) {
-              this.drawPoint("P0-"+i , this.arrayPoint2D[i].x, this.arrayPoint2D[i].y);
-          }
-          
-          var index = 0;
-          
-          for (var i = 0; i < this.indexSegment2D; i++) {
-              var p1 = this.arraySegment2D[i].p1;
-              var p2 = this.arraySegment2D[i].p2;
-              
-              if(p2) {
-                 this.drawCoordinates(p1.x, p1.y);
-                 this.drawCoordinates(p2.x, p2.y);
-                 this.drawLine(p1, p2);
-                 
-                 if(i == 0) {
-                   this.drawText("S0-"+index , p1.x, p1.y);
-                   index++
-                 } 
-                   
-                   if(i == this.indexSegment2D - 1) { //last element
-                     if(p2.id != this.arraySegment2D[0].p1.id) {
-                       this.drawText("S0-"+index , p2.x, p2.y);
-                       index++;
-                     }
-                   } else {
-                       this.drawText("S0-"+index , p2.x, p2.y);
-                       index++;
-                   }
-                 
-                 
-              } else {
-                this.drawCoordinates(p1.x, p1.y);
-                this.drawText("S0-"+index , p1.x, p1.y);
-                index++;
-              }
-          }
-          
-          this.drawBezier(this.curve.points);
+          zone.drawPoints();
+          zone.drawSegments();
+          zone.drawcurves();
 }
 
 //===========================================================================
@@ -713,122 +296,84 @@ var actionChangeMode = function(mode) {
 
 //===========================================================================
 
-$("#buttonMoveImage").click(function(e){
-    actionChangeMode("move");
-});
+$("#buttonMoveImage").click(function(e){ actionChangeMode("move"); });
+$("#buttonDrawPoint").click(function(e){ actionChangeMode("drawPoint"); });
+$("#buttonDrawSegment").click(function(e){ actionChangeMode("drawSegment"); });
+$("#buttonDrawCurve").click(function(e){ actionChangeMode("drawCurve"); });
+$("#buttonDeletePoint").click(function(e){ actionChangeMode("deletePoint"); });
+$("#buttonDeletePointSegment").click(function(e){ actionChangeMode("deletePointSegment"); });
+$("#buttonDeletePointCurve").click(function(e){ actionChangeMode("deletePointCurve"); });
+$("#buttonMovePoint").click(function(e){ actionChangeMode("movePoint"); });
+$("#buttonMovePointSegment").click(function(e){ actionChangeMode("movePointSegment"); });
+$("#buttonMovePointCurve").click(function(e){ actionChangeMode("movePointCurve"); });
+$("#buttonAddPointOnSegment").click(function(e){ actionChangeMode("addPointOnSegment"); });
+$("#buttonAddPointOnCurve").click(function(e){ actionChangeMode("addPointOnCurve"); });
 
 //===========================================================================
 
-$("#buttonDrawPoint").click(function(e){
-    actionChangeMode("drawPoint");
-});
+canvas.addOptionToList = function (element, text) {
+    var option = document.createElement("option");
+    option.value = text;
+    option.text = text;
+    option.selected = "selected";
+    element.add(option);
+}
+
+canvas.rezetOptionList = function(element) {
+    while (element.firstChild) {
+        element.removeChild(element.firstChild);
+    }
+}
+
+canvas.newEnv = function() {
+    zone.rezet();
+    var points = document.getElementById("selectedPartitionPoint");
+    var segments = document.getElementById("selectedPartitionSegment");
+    var curves = document.getElementById("selectedPartitionCurve");
+    this.rezetOptionList(points);
+    this.rezetOptionList(segments);
+    this.rezetOptionList(curves);
+    this.addOptionToList(points, "P0");
+    this.addOptionToList(segments, "S0");
+    this.addOptionToList(curves, "C0");
+}
 
 //===========================================================================
 
-$("#buttonDrawSegment").click(function(e){
-    actionChangeMode("drawSegment");
-});
-
-//===========================================================================
-
-$("#buttonDrawCurve").click(function(e){
-    actionChangeMode("drawCurve");
-});
-
-
-//===========================================================================
-
-$("#buttonDeletePoint").click(function(e){ 
-    actionChangeMode("deletePoint");
-});
-
-//===========================================================================
-
-$("#buttonDeletePointSegment").click(function(e){ 
-    actionChangeMode("deletePointSegment");
-});
-
-//===========================================================================
-
-$("#buttonDeletePointCurve").click(function(e){ 
-    actionChangeMode("deletePointCurve");
-});
-
-//===========================================================================
-
-$("#buttonMovePoint").click(function(e){ 
-    actionChangeMode("movePoint");
-});
-
-//===========================================================================
-
-$("#buttonMovePointSegment").click(function(e){ 
-    actionChangeMode("movePointSegment");
-});
-
-//===========================================================================
-
-$("#buttonMovePointCurve").click(function(e){ 
-    actionChangeMode("movePointCurve");
-});
-
-//===========================================================================
-
-$("#buttonAddPointOnSegment").click(function(e){ 
-    actionChangeMode("addPointOnSegment");
-});
-
-//===========================================================================
-
-$("#buttonAddPointOnCurve").click(function(e){ 
-    actionChangeMode("addPointOnCurve");
-});
-
-//===========================================================================
-
-$("#deleteLastElement").click(function(e){ 
-  
+$("#clearImage").click(function(e){
     if(canvas.started) {
-        if(canvas.state == "drawPoint") {
-            if(canvas.indexPoint2D > 0) {
-                canvas.indexPoint2D--;
-                canvas.arrayPoint2D.pop();
-            }
-        }
-        
-        if(canvas.state == "drawSegment") {
-            if(canvas.indexSegment2D > 0) {
-                  if(canvas.indexSegment2D == 1) {
-                    canvas.firstSegment = true;
-                  }
-                  canvas.indexSegment2D--;
-                  canvas.arraySegment2D.pop();
-            }
-        }
-        
-        if(canvas.state == "drawCurve") {
-            if(canvas.curve.size > 0) {
-                canvas.curve.size--;
-                canvas.curve.points.pop();
-            }
-        }
-        
+        zone.rezet();
+        canvas.newEnv();
         canvas.redraw();
     }
 });
 
 //===========================================================================
 
-
-$("#clearImage").click(function(e){
+$("#buttonClearPartitionPoint").click(function(e){
     if(canvas.started) {
-        canvas.indexPoint2D = 0;
-        canvas.arrayPoint2D = [];
-        canvas.indexSegment2D = 0;
-        canvas.arraySegment2D = [];
-        canvas.firstSegment = true;
-        canvas.curve.size = 0;
-        canvas.curve.points = [];
+        var part = zone.pointsPartition[zone.cidPoint];
+        zone.pointsPartition[zone.cidPoint] = new Partition(part.id);
+        canvas.redraw();
+    }
+});
+
+//===========================================================================
+
+$("#buttonClearPartitionSegment").click(function(e){
+    if(canvas.started) {
+        var part = zone.segmentsPartition[zone.cidSegment];
+        zone.segmentsPartition[zone.cidSegment] = new SegmentPartition(part.id);
+        canvas.redraw();
+    }
+});
+
+//===========================================================================
+
+$("#buttonClearPartitionCurve").click(function(e){
+    if(canvas.started) {
+        var part = zone.curvesPartition[zone.cidCurve];
+        zone.curvesPartition[zone.cidCurve] = new Curve2D(part.id);
         canvas.redraw();
     }
 });
@@ -838,15 +383,10 @@ $("#clearImage").click(function(e){
 $("#buttonNewPartitionPoint").click(function(e){
   if(canvas.started) {
     var x = document.getElementById("selectedPartitionPoint");
-    var option = document.createElement("option");
-    canvas.sizePointsPartition++;
-    var id = canvas.sizePointsPartition;
-    option.value = "P"+id;
-    option.text = "P"+id;
-    option.selected = "selected";
-    x.add(option);
-    canvas.pointsPartition[id] = new Partition(id);
-    canvas.currentPointPartiton = id;
+    var id = zone.pointsPartition.length;
+    canvas.addOptionToList(x, "P"+id);
+    zone.pointsPartition[id] = new Partition(id);
+    zone.cidPoint = id;
   }
 });
 
@@ -855,15 +395,10 @@ $("#buttonNewPartitionPoint").click(function(e){
 $("#buttonNewPartitionSegment").click(function(e){
   if(canvas.started) {
     var x = document.getElementById("selectedPartitionSegment");
-    var option = document.createElement("option");
-    canvas.sizeSegmentsPartition++;
-    var id = canvas.sizeSegmentsPartition;
-    option.value = "S"+id;
-    option.text = "S"+id;
-    option.selected = "selected";
-    x.add(option);
-    canvas.segmentsPartition[id] = new Partition(id);
-    canvas.currentSegmentPartiton = id;
+    var id = zone.segmentsPartition.length;
+    canvas.addOptionToList(x, "S"+id);
+    zone.segmentsPartition[id] = new SegmentPartition(id);
+    zone.cidSegment = id;
   }
 });
 
@@ -872,15 +407,10 @@ $("#buttonNewPartitionSegment").click(function(e){
 $("#buttonNewPartitionCurve").click(function(e){
   if(canvas.started) {
     var x = document.getElementById("selectedPartitionCurve");
-    var option = document.createElement("option");
-    canvas.sizeCurvesPartition++;
-    var id = canvas.sizeCurvesPartition;
-    option.value = "C"+id;
-    option.text = "C"+id;
-    option.selected = "selected";
-    x.add(option);
-    canvas.curvesPartition[id] = new Curve2D(id);
-    canvas.currentCurvePartiton = id;
+    var id = zone.curvesPartition.length;
+    canvas.addOptionToList(x, "C"+id);
+    zone.curvesPartition[id] = new Curve2D(id);
+    zone.cidCurve = id;
   }
 });
 
@@ -894,21 +424,28 @@ $("#buttonDeletePartitionPoint").click(function(e){
     var id = conceptName.substring(1);
     var collectionPoint = [];
     var j = 0;
-    for (var i = 0; i < canvas.pointsPartition.length; i++) {
-      var partition = canvas.pointsPartition[i];
+    for (var i = 0; i < zone.pointsPartition.length; i++) {
+      var partition = zone.pointsPartition[i];
       if(partition.id != id) {
         collectionPoint[j] = partition;
         j++;
+      } else {
+        collectionPoint[j] = new Partition(id);
+        collectionPoint[j].alive = false;
+        j++;
       }
     }
-    canvas.pointsPartition = collectionPoint;
-    if(canvas.pointsPartition.length > 0) {
-      //cad l'identifiant de la 1er partition
-      canvas.currentPointPartiton = canvas.pointsPartition[0].id;
-    } else {
-      canvas.currentPointPartiton = null;
-    }
+    zone.pointsPartition = collectionPoint;
     
+    zone.cidPoint = -1;
+    for (var i = 0; i < zone.pointsPartition.length; i++) {
+      if(zone.pointsPartition[i].alive) {
+        zone.cidPoint = i;
+        break;
+      }
+    }
+  
+    canvas.redraw();
   }
 });
 
@@ -922,20 +459,29 @@ $("#buttonDeletePartitionSegment").click(function(e){
     var id = conceptName.substring(1);
     var collectionSegment = [];
     var j = 0;
-    for (var i = 0; i < canvas.segmentsPartition.length; i++) {
-      var partition = canvas.segmentsPartition[i];
+    for (var i = 0; i < zone.segmentsPartition.length; i++) {
+      var partition = zone.segmentsPartition[i];
       if(partition.id != id) {
-        segmentsPartition[j] = partition;
+        collectionSegment[j] = partition;
+        j++;
+      } else {
+        collectionSegment[j] = new SegmentPartition(id);
+        collectionSegment[j].alive = false;
         j++;
       }
     }
-    canvas.segmentsPartition = collectionSegment;
-    if(canvas.segmentsPartition.length > 0) {
-      //cad l'identifiant de la 1er partition
-      canvas.currentSegmentPartiton = canvas.segmentsPartition[0].id;
-    } else {
-      canvas.currentSegmentPartiton = null;
+    
+    zone.segmentsPartition = collectionSegment;
+
+    zone.cidSegment = -1;
+    for (var i = 0; i < zone.segmentsPartition.length; i++) {
+      if(zone.segmentsPartition[i].alive) {
+        zone.cidSegment = i;
+        break;
+      }
     }
+
+    canvas.redraw();
   }
 });
 
@@ -949,45 +495,50 @@ $("#buttonDeletePartitionCurve").click(function(e){
     var id = conceptName.substring(1);
     var collectionCurve = [];
     var j = 0;
-    for (var i = 0; i < canvas.curvesPartition.length; i++) {
-      var partition = canvas.curvesPartition[i];
+    for (var i = 0; i < zone.curvesPartition.length; i++) {
+      var partition = zone.curvesPartition[i];
       if(partition.id != id) {
         collectionCurve[j] = partition;
         j++;
+      } else {
+        collectionCurve[j] = new Curve2D(id);
+        collectionCurve[j].alive = false;
+        j++;
       }
     }
-    canvas.curvesPartition = collectionCurve;
-    if(canvas.curvesPartition.length > 0) {
-      //cad l'identifiant de la 1er partition
-      canvas.currentCurvePartiton = canvas.curvesPartition[0].id;
-    } else {
-      canvas.currentCurvePartiton = null;
+    zone.curvesPartition = collectionCurve;
+    
+    zone.cidCurve = -1;
+    for (var i = 0; i < zone.curvesPartition.length; i++) {
+      if(zone.curvesPartition[i].alive) {
+        zone.cidCurve = i;
+        break;
+      }
     }
+    canvas.redraw();
   }
 });
 
 //===========================================================================
 
 $( "#selectedPartitionPoint" ).change(function() {
-    var conceptName = $('#selectedPartitionPoint').find(":selected").text();
-    var id = conceptName.substring(1);
-    canvas.currentPointPartiton = id;
+    zone.cidPoint = $('#selectedPartitionPoint').find(":selected").text().substring(1);
 });
 
 //===========================================================================
 
 $( "#selectedPartitionSegment" ).change(function() {
-    var conceptName = $('#selectedPartitionSegment').find(":selected").text();
-    var id = conceptName.substring(1);
-    canvas.currentSegmentPartiton = id;
+    zone.cidSegment = $('#selectedPartitionSegment').find(":selected").text().substring(1);
+    zone.newA = null;
+    zone.newB = null;
 });
 
 //===========================================================================
 
 $( "#selectedPartitionCurve" ).change(function() {
-    var conceptName = $('#selectedPartitionCurve').find(":selected").text();
-    var id = conceptName.substring(1);
-    canvas.currentCurvePartiton = id;
+    zone.cidCurve = $('#selectedPartitionCurve').find(":selected").text().substring(1);
+    zone.newCA = null;
+    zone.newCB = null;
 });
 
 //===========================================================================
@@ -1060,114 +611,116 @@ function trackTransforms(ctx){
 
 canvas.loadCanvas = function (dataimage) {
   
-  this.idPoint = 0;
-  this.indexSegment2D = 0;
+  canvas.newEnv();
   
-  //points
+  var PP = dataimage.result.MultiPoints;
+  var px = document.getElementById("selectedPartitionPoint");
+  this.rezetOptionList(px);
   
-  this.indexPoint2D = dataimage.result.MultiPoint.length;
-  for (var i = 0; i < this.indexPoint2D; i++) {
-      var p = dataimage.result.MultiPoint[i];
-      var point = new Point2D(this.idPoint, p[0], p[1]);
-      this.idPoint += 1;
-      this.arrayPoint2D.push(point);
+  for (var i = 0; i < PP.length; i++) {
+    var ptp = PP[i];
+    var partition = new Partition(i);
+    for (var j = 0; j < ptp.length; j++) {
+      var points = ptp[j];
+      partition.addNewPoint(points[0], points[1]);
+    }
+    zone.pointsPartition[i] = partition;
+    zone.cidPoint = i;
+    this.addOptionToList(px, "P"+i);
   }
   
-  //segments
-  
-  var MultiLineString = dataimage.result.MultiLineString;
-  for (var i = 0; i < MultiLineString.length; i++) {
-     var currentMLS = MultiLineString[i];
-  
-     if(currentMLS.length == 1) { //alors segment
-        var tmpPointsSegment = currentMLS[0];
-        var tmp2PointsSegment = [];
-        
-        for (var j = 0; j < tmpPointsSegment.length; j++) {
-              var p = tmpPointsSegment[j];
-              var point = new Point2D(this.idPoint, p[0], p[1]);
-              this.idPoint += 1;
-              tmp2PointsSegment.push(point);
-        }
-          this.firstSegment = true;
-  
-          if(tmpPointsSegment.length > 2) {
-            this.firstSegment = false;
-          }
-          
-          for (var j = 0; j < tmpPointsSegment.length-1; j++) {
-            var p1 = tmp2PointsSegment[j];
-            var p2 = tmp2PointsSegment[j+1];
-            var segment = new Segment2D(this.indexSegment2D, p1, p2);
-            this.arraySegment2D.push(segment);
-            this.indexSegment2D += 1;
-          }
-  
-     } else { //sinon curve
-         this.curve.size = currentMLS[0].length;
-         this.typeofcurve = "open";
-  
-          for (var j = 0; j <  this.curve.size; j++) {
-            var p = currentMLS[0][j];
-            var point = new Point2D(this.idPoint, p[0], p[1]);
-            this.curve.points.push(point);
-            this.idPoint += 1;
-          }
-     }
+  if(PP.length == 0) {
+    zone.pointsPartition[i] = new Partition(0);
+    zone.cidPoint = 0;
+    this.addOptionToList(px, "P0");
   }
   
-  var MultiPolygon = dataimage.result.MultiPolygon;
-  for (var i = 0; i < MultiPolygon.length; i++) {
-         var currentMLS = MultiPolygon[i];
+  var MLS = dataimage.result.MultiLineString;
+  var sx = document.getElementById("selectedPartitionSegment");
+  this.rezetOptionList(sx);
   
-     if(currentMLS.length == 1) { //alors segment
-        var tmpPointsSegment = currentMLS[0];
-        var tmp2PointsSegment = [];
-        
-        for (var j = 0; j < tmpPointsSegment.length; j++) {
-              var p = tmpPointsSegment[j];
-              var point = new Point2D(this.idPoint, p[0], p[1]);
-              this.idPoint += 1;
-              tmp2PointsSegment.push(point);
-        }
-        
-          this.firstSegment = true;
-  
-          if(tmpPointsSegment.length > 2) {
-            this.firstSegment = false;
-          }
-          
-          for (var j = 0; j < tmpPointsSegment.length-1; j++) {
-            var p1 = tmp2PointsSegment[j];
-            var p2 = tmp2PointsSegment[j+1];
-            
-            if(j == tmpPointsSegment.length-2) {
-              if(p1.x == p2.x) {
-                 if(p1.y == p2.y) {
-                   p2 = tmp2PointsSegment[0];
-                 }
-              }
-            }
-            
-            var segment = new Segment2D(this.indexSegment2D, p1, p2);
-            this.arraySegment2D.push(segment);
-            this.indexSegment2D += 1;
-          }
-  
-     } else { //sinon curve
-         this.curve.size = currentMLS[0].length;
-         this.typeofcurve = "close";
-  
-          for (var j = 0; j <  this.curve.size; j++) {
-            var p = currentMLS[0][j];
-            var point = new Point2D(this.idPoint, p[0], p[1]);
-            this.curve.points.push(point);
-            this.idPoint += 1;
-          }
-     }
+  var cx = document.getElementById("selectedPartitionCurve");
+  this.rezetOptionList(cx);
+
+  var indexSP = 0;
+  var indexCP = 0;
+  for (var i = 0; i < MLS.length; i++) {
+    var ptp = MLS[i];
+    if(ptp.length == 1) {
+       //segments MultiLineString
+       ptp = ptp[0];
+       var partition = new SegmentPartition(indexSP);
+      
+       for (var j = 0; j < ptp.length; j++) {
+         var points = ptp[j];
+         partition.addNewPoint(points[0], points[1]);
+       }
+       
+        zone.segmentsPartition[indexSP] = partition;
+        zone.cidSegment = indexSP;
+        this.addOptionToList(sx, "S"+indexSP);
+        indexSP++;
+    } else {
+      ptp = ptp[0];
+      var partition = new Curve2D(indexCP);
+      for (var j = 0; j < ptp.length; j++) {
+         var points = ptp[j];
+         partition.addNewPoint(points[0], points[1]);
+       }
+       zone.curvesPartition[indexCP] = partition;
+       zone.cidCurve = indexCP;
+       this.addOptionToList(cx, "C"+indexCP);
+       indexCP++;
+    }
     
   }
   
+  var MP = dataimage.result.MultiPolygon;
+  for (var i = 0; i < MP.length; i++) {
+    var ptp = MP[i];
+    if(ptp.length == 1) {
+       //segments MultiPolygon
+       ptp = ptp[0];
+       var partition = new SegmentPartition(indexSP);
+
+       for (var j = 0; j < ptp.length; j++) {
+         var points = ptp[j];
+         partition.addNewPoint(points[0], points[1]);
+       }
+       
+       partition.content[partition.content.length-1].p2 = partition.content[0].p1;
+      
+        zone.segmentsPartition[indexSP] = partition;
+        zone.cidSegment = indexSP;
+        this.addOptionToList(sx, "S"+indexSP);
+        indexSP++;
+    } else {
+      ptp = ptp[0];
+      var partition = new Curve2D(indexCP);
+      for (var j = 0; j < ptp.length; j++) {
+         var points = ptp[j];
+         partition.addNewPoint(points[0], points[1]);
+       }
+       zone.curvesPartition[indexCP] = partition;
+       zone.cidCurve = indexCP;
+       this.addOptionToList(cx, "C"+indexCP);
+       indexCP++;
+    }
+    
+  }
+  
+  if(indexSP == 0) {
+    zone.segmentsPartition[i] = new SegmentPartition(0);
+    zone.cidSegment = 0;
+    this.addOptionToList(sx, "S0");
+  }
+  
+    if(indexCP == 0) {
+    zone.curvesPartition[i] = new Curve2D(0);
+    zone.cidCurve = 0;
+    this.addOptionToList(cx, "C0");
+  }
+
   this.redraw();
 }
 
@@ -1190,13 +743,52 @@ function drawImage(path) {
 
 //===========================================================================
 
+function round3(number) {
+  var factor = Math.pow(10, 3);
+  return Math.round(number * factor) / factor;
+}
+
 /**
  * Object Point2D  
  **/
-var Point2D = function (id, x,y) {
-  this.id = id;
+var Point2D = function (x,y) {
   this.x = x;
   this.y = y;
+  this.printed = true;
+  
+  this.draw = function(value) {
+    canvas.drawCoordinates(this.x, this.y);
+    canvas.drawText(value, this.x, this.y);
+  }
+  
+  this.equal = function(point) {
+    if(this.x == point.x) {
+      if(this.y == point.y) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  this.distance = function (p2) {
+    return Math.sqrt(Math.pow(p2.x - this.x, 2) + Math.pow(p2.y - this.y, 2));
+  }
+  
+  this.middle = function(p2) {
+    var nx = (this.x + p2.x) / 2;
+    var ny = (this.y + p2.y) / 2;
+    var p = new Point2D(nx, ny);
+    return p;
+  }
+  
+  this.toMOM = function() {
+      return round3(this.x) + " " + round3(this.y);
+  }
+  
+  this.toYML = function() {
+    return "[" + round3(this.x) + ", " + round3(this.y) + "]";
+  }
+
 }
 
 //===========================================================================
@@ -1204,27 +796,868 @@ var Point2D = function (id, x,y) {
 /**
  * Object Segment2D
  **/
-var Segment2D = function (id, p1, p2) {
-  this.id = id;
+var Segment2D = function (p1, p2) {
   this.p1 = p1;
   this.p2 = p2;
+  
+  this.draw = function () {
+    canvas.drawCoordinates(this.p1.x, this.p1.y);
+    canvas.drawCoordinates(this.p2.x, this.p2.y);
+    canvas.drawLine(this.p1, this.p2);
+  }
+  
+  this.equal = function(segment) {
+    if(this.p1.equal(segment.p1)) {
+      if(this.p2.equal(segment.p2)) {
+          return true;
+      }
+    }
+    
+    if(this.p1.equal(segment.p2)) {
+      if(this.p2.equal(segment.p1)) {
+          return true;
+      }
+    }
+   
+    return false; 
+  }
 }
 
 //===========================================================================
 
 var Curve2D = function (id) {
    this.id = id;
-   this.size = 0;
    this.points = [];
    this.allpts = null;
+   this.alive = true;
+   
+   this.notEmpty = function() {
+     return this.size() != 0;
+   }
+   
+   this.addNewPoint = function(x, y) {
+      var point = new Point2D(x, y);
+      this.points.push(point);
+   }
+   
+   this.size = function() {
+     return this.points.length;
+   }
+   
+   this.movePoint = function(x, y) {
+      var position = new Point2D(x, y); 
+      for (var j = 0; j < this.size(); j++) {
+          if(position.distance(this.points[j]) <= canvas.pointSize) {
+              zone.draggedPoint = this.points[j];
+              return;
+          }
+      }
+   }
+   
+   this.remove = function(x, y) {
+       var position = new Point2D(x, y);
+       for (var j = 0; j < this.size(); j++) {
+          if(position.distance(this.points[j]) <= canvas.pointSize) {
+              var nc = [];
+              for (var k = 0; k < j; k++) {
+                nc.push(this.points[k]);
+              }
+              for (var k = j+1; k < this.size(); k++) {
+                nc.push(this.points[k]);
+              }
+              this.points = nc;
+              return;
+          }
+       }
+   }
+   
+   this.toYML = function() {
+     var txt = "";
+     
+     if(this.size() > 0) {
+        txt = "[[";
+      
+          for (var j = 0; j < this.size(); j++) {
+             var p = this.points[j];
+
+             
+             if(j < this.size()-1) {
+               txt = txt + p.toYML() + ", ";
+             } else {
+               txt = txt + p.toYML();
+             }
+           }
+        txt = txt + "],[";
+        
+        for (var k = 0; k < this.allpts.length; k++) {
+          var p = this.allpts[k];
+            if(k < this.allpts.length - 1) {
+              txt = txt + round3(p) + ", ";
+            } else {
+              txt = txt + round3(p);
+            }
+        }
+      
+         txt = txt + "]]";
+     } else {
+
+     }
+     
+     return txt;
+   }
+   
+   this.toMOM = function() {
+      var txt = "";
+
+      if(this.size() > 0) {
+          if(canvas.typeofcurve == "open") {
+            txt ="#LineString\n";
+          } else { 
+            txt = "#Polygon\n";
+          }
+  
+          for (var j = 0; j < this.size(); j++) {
+            txt = txt + this.points[j].toMOM() + "\n";
+          }
+         
+          if(canvas.typeofcurve == "open") {
+            txt = txt + "#LineString_all\n";
+          } else { 
+            txt = txt + "#Polygon_all\n";
+          }
+
+          var index = 1;
+          for (var k = 0; k < this.allpts.length; k++) {
+             x = this.allpts[k];
+              if(index == 2) {
+                txt = txt + round3(x) + "\n";
+                index = 0;
+              } else {
+                txt = txt + round3(x) + " ";
+              }
+              index++;
+          }
+       }
+       
+      return txt;
+   }
+}
+
+//===========================================================================
+
+var SegmentPartition = function(id) {
+   this.id = id;
+   this.content = [];
+   this.firstSegment = true;
+   this.alive = true;
+   
+   this.add = function(segment) {
+     this.content.push(segment);
+   }
+   
+   this.addNewSegment = function(p1, p2) {
+     var segment = new Segment2D(p1, p2);
+     this.content.push(segment);
+   }
+   
+   this.addNewPoint = function(x, y) {
+      var point = new Point2D(x, y);
+      if(this.firstSegment) {
+        if(this.size() == 0) {
+          this.addNewSegment(point, null);
+        } else {
+          this.content[this.size()-1].p2 = point;
+          this.firstSegment = false;
+        }
+      } else {
+        var last = this.content[this.size()-1].p2;
+        this.addNewSegment(last, point);
+      }
+   }
+   
+   this.movePoint = function(x, y) {
+      var position = new Point2D(x, y); 
+      for (var j = 0; j < this.size(); j++) {
+          if(position.distance(this.content[j].p1) <= canvas.pointSize) {
+              zone.draggedPoint = this.content[j].p1;
+              return;
+          } else if(position.distance(this.content[j].p2) <= canvas.pointSize) {
+             zone.draggedPoint = this.content[j].p2;
+             return;
+          }
+      }
+   }
+   
+   this.notEmpty = function() {
+     return this.size() != 0;
+   }
+   
+   this.draw = function() {
+         var index = 0;
+    
+        for (var j = 0; j < this.size(); j++) {
+            this.content[j].p1.printed = true;
+            if(this.content[j].p2) {
+              this.content[j].p2.printed = true;
+            }
+        }
+                  
+        for (var j = 0; j < this.size(); j++) {
+            var p1 = this.content[j].p1;
+            var p2 = this.content[j].p2;
+            var value = "S"+this.id+"-";
+                      
+            if(p2) {
+                this.content[j].draw();
+                         
+                if(j == 0) {
+                    if(p1.printed) {
+                      canvas.drawText(value+index, p1.x, p1.y);
+                      index++;
+                      p1.printed = false;
+                    }
+                    
+                } 
+                           
+                if(i == this.size() - 1) { //last element
+                    if(!p2.equal(this.content[j].p1)) {
+                        if(p2.printed) {
+                          canvas.drawText(value+index, p2.x, p2.y);
+                           index++;
+                           p2.printed = false;
+                        }
+                       
+                    }
+                } else {
+                   if(p2.printed) {
+                    canvas.drawText(value+index, p2.x, p2.y);
+                     index++;
+                     p2.printed = false;
+                   }
+                   
+                }
+             } else {
+                if(p1.printed) {
+                  canvas.drawCoordinates(p1.x, p1.y);
+                  canvas.drawText(value+index, p1.x, p1.y);
+                   index++;
+                   p1.printed = false;
+                }
+                 
+             }
+        }
+   }
+   
+   this.remove = function(x, y) {
+      var position = new Point2D(x, y);
+      for (var j = 0; j < this.size(); j++) {
+          var segment = this.content[j];
+          var pToDelete = 0;
+          var ns = [];
+          this.firstSegment = false;
+                  
+           if(position.distance(segment.p1) <= canvas.pointSize) {
+              pToDelete = 1;
+           } else if(position.distance(segment.p2) <= canvas.pointSize) {
+              pToDelete = 2;
+           }
+           
+           if(j == 0 && pToDelete == 1) { //cas particulier de 1er
+               console.log("first");
+              for (var k = 1; k < this.size(); k++) {
+                ns.push(this.content[k]);
+              }
+              if(ns.length == 0) {
+                this.firstSegment = true;
+              }
+              this.content = ns;
+              return;
+            } else if(j == this.size() - 1 && pToDelete == 2) { // cas du dernier element
+                for (var k = 0; k < this.size() - 1; k++) {
+                  ns.push(this.content[k]);
+                }
+                if(ns.length == 0) {
+                  this.firstSegment = true;
+                }
+                this.content = ns;
+                return;
+            } else if(pToDelete > 0) {
+              for (var k = 0; k < this.size(); k++) {
+                if(k == j) {
+                  var old = this.content[k];
+                  var old2 = this.content[k+1];
+                  var p1 = new Point2D(old.p1.x, old.p1.y);
+                  var p2 = new Point2D(old2.p2.x, old2.p2.y);
+                  var newss = new Segment2D(p1, p2);
+                  ns.push(newss);
+                } else {
+                  if(j+1 == k) {
+                    //nothing to do                         
+                  } else {
+                    ns.push(this.content[k]);
+                  }
+                }
+              }
+                if(ns.length == 0) {
+                  this.firstSegment = true;
+                }
+                this.content = ns;
+                return;
+            }
+          }
+   }
+  
+   this.size = function() {
+     return this.content.length;
+   }
+   
+   this.toYML = function() {
+     var txt = "";
+     
+     if(this.size() > 0) {
+        txt = "[[";
+      
+          for (var j = 0; j < this.size(); j++) {
+             var s = this.content[j];
+             if(j == 0) {
+               txt = txt + s.p1.toYML() + ", ";
+             } 
+             
+             if(j < this.size()-1) {
+               txt = txt + s.p2.toYML() + ", ";
+             } else {
+               txt = txt + s.p2.toYML();
+             }
+           }
+        txt = txt + "]]";
+     }
+     
+     return txt;
+   }
+  
+   this.toMOM = function() {
+      var txt = "";
+     
+       if(this.size() > 0) {
+        txt = "#LineString";
+
+        if(this.isPolygon()) {
+          txt = "#Polygon";
+        }
+
+        txt = txt + "\n";
+        
+           for (var j = 0; j < this.size(); j++) {
+             var s = this.content[j];
+             if(j == 0) {
+               txt = txt + s.p1.toMOM() +  "\n";
+             }
+             txt = txt + s.p2.toMOM() + "\n";
+           }
+      }
+  
+      return txt;
+   }
+   
+   this.isLineString = function() {
+      if(this.size() < 1) {
+        return false;
+      }
+    
+      if(this.size() == 1) {
+        return true;
+      }
+    
+      var firstP = this.content[0].p1;
+      var lastP = this.content[this.size()-1].p2;
+    
+      return !firstP.equal(lastP);
+   }
+   
+   this.isPolygon = function() {
+     //TODO fermet le segment si polygon;
+      if(this.size() < 2) {
+        return false;
+      }
+  
+    
+      var firstP = this.content[0].p1;
+      var lastP = this.content[this.size()-1].p2;
+    
+      return firstP.equal(lastP);
+   }
 }
 
 //===========================================================================
 
 var Partition = function (id) {
    this.id = id;
-   this.size = 0;
    this.content = [];
+   this.alive = true;
+   
+   this.addNewPoint = function(x, y) {
+      var point = new Point2D(x, y);
+      this.content.push(point);
+   }
+   
+   this.add = function(point) {
+     this.content.push(point);
+   }
+   
+   this.size = function() {
+     return this.content.length;
+   }
+   
+   this.draw = function() {
+      for (var j = 0; j < this.size(); j++) {
+        this.content[j].draw("P"+this.id+"-"+j);
+      }
+   }
+   
+   this.notEmpty = function() {
+     return this.size() != 0;
+   }
+   
+   this.movePoint = function(x, y) {
+      var position = new Point2D(x, y);
+      for (var j = 0; j < this.size(); j++) {
+          var point = this.content[j];
+          if(position.distance(point) <= canvas.pointSize) {
+              zone.draggedPoint = point;
+              return;
+          }
+      }
+   }
+  
+    this.remove = function(x, y) {
+      var position = new Point2D(x, y);
+      for (var j = 0; j < this.size(); j++) {
+          if(position.distance(this.content[j]) <= canvas.pointSize) {
+            var np = [];
+            for (var k = 0; k < j; k++) {
+              np.push(this.content[k]);
+            }
+            for (var k = j+1; k < this.size(); k++) {
+              np.push(this.content[k]);
+            }
+            this.content = np;
+            return;
+          }
+       }
+    }
+    
+    this.toYML = function() {
+      var txt = "";
+  
+      if(this.size() > 0) {
+        txt = '[';
+    
+        if(this.size() == 1) {
+          txt = txt, this.content[0].toYML() + ']';
+        } else {
+          for (var j = 0; j < this.size()-1; j++) {
+            txt = txt + this.content[j].toYML() + ', ';
+          }
+          txt = txt + this.content[j].toYML() + ']';
+        }
+      }
+
+      return txt;
+    }
+    
+    this.toMOM = function() {
+       var txt = "";
+       
+       if(this.size() > 0) {
+         txt = "#MultiPoint" + "\n";
+         
+         for (var j = 0; j < this.size()-1; j++) {
+             txt = txt + this.content[j].toMOM()+ "\n";
+         }
+       }
+    
+       return txt;
+    }
+  
+}
+
+//===========================================================================
+
+var ZoneP = function () {
+  
+  this.cidPoint = 0;
+  this.cidSegment = 0;
+  this.cidCurve = 0;
+  
+  this.pointsPartition = [];
+  this.segmentsPartition = [];
+  this.curvesPartition = [];
+  
+  this.dragStart = null;
+  this.draggedPoint = null;
+  
+  this.newA = null;
+  this.newB = null;
+  
+  this.newCA = null;
+  this.newCB = null;
+  
+  this.pointsPartition[0] = new Partition(0);
+  this.segmentsPartition[0] = new SegmentPartition(0);
+  this.curvesPartition[0] = new Curve2D(0);
+  
+  this.rezet = function() {
+    this.pointsPartition = [];
+    this.segmentsPartition = [];
+    this.curvesPartition = [];
+        
+    this.pointsPartition[0] = new Partition(0);
+    this.segmentsPartition[0] = new SegmentPartition(0);
+    this.curvesPartition[0] = new Curve2D(0);
+        
+    this.cidPoint = 0;
+    this.cidSegment = 0;
+    this.cidCurve = 0;
+    
+    this.MOM = "";
+    this.YML = "";
+    
+  }
+  
+  this.addPoint = function(pt) {
+    if(this.cidPoint != -1) {
+      this.pointsPartition[this.cidPoint].addNewPoint(pt.x, pt.y);
+    }
+  }           
+  
+  this.addSegment = function(pt) {
+    if(this.cidSegment != -1) {
+      this.segmentsPartition[this.cidSegment].addNewPoint(pt.x, pt.y);
+    }
+  }
+  
+  this.addCurve = function(pt) {
+    if(this.cidCurve != -1) {
+      this.curvesPartition[this.cidCurve].addNewPoint(pt.x, pt.y);
+    }
+  }
+  
+  this.deletePoint = function(pt) {
+    if(this.cidPoint != -1) {
+      for (var i = 0; i < this.pointsPartition.length; i++) {
+        this.pointsPartition[i].remove(pt.x, pt.y);
+      }
+    }
+  }
+  
+  this.deleteSegment = function(pt) {
+    if(this.cidSegment != -1) {
+      for (var i = 0; i < this.segmentsPartition.length; i++) {
+        this.segmentsPartition[i].remove(pt.x, pt.y);
+      }
+    }
+  }
+  
+  this.deleteCurve = function(pt) {
+    if(this.cidPoint != -1) {
+      for (var i = 0; i < this.curvesPartition.length; i++) {
+        this.curvesPartition[i].remove(pt.x, pt.y);
+      }
+    }
+  }
+  
+  this.addPointCurve = function(pt) {
+      if(this.cidCurve != -1) {
+          var point = new Point2D(pt.x, pt.y);
+          var partition = this.curvesPartition[this.cidCurve];
+        
+          for (var i = 0; i < partition.size(); i++) {
+            var p = partition.points[i];
+            
+              if(this.newCA == null) {
+                  if(point.distance(p) <= canvas.pointSize) {
+                    this.newCA = p;
+                  }
+              } else if(this.newCB == null) {
+                   if(point.distance(p) <= canvas.pointSize) {
+                    this.newCB = p;
+                  }
+              }
+          }
+           
+           if(this.newCA != null && this.newCB != null) {
+                var p = this.newCA.middle(this.newCB);
+                var indexA = 0;
+                var indexB = 0;
+                for (var j = 0; j < partition.size(); j++) {
+                  var lastp = partition.points[j];
+                  if(lastp.equal(this.newCA)) {
+                    indexA = j;
+                  }
+                  if(lastp.equal(this.newCB)) {
+                    indexB = j;
+                  }
+                }
+                
+                var index = Math.min(indexA, indexB);
+                var c = [];
+                
+                for (var k = 0; k <= index; k++) {
+                  c.push(partition.points[k]);
+                }
+                
+                c.push(p);
+                
+                 for (var k = index+1; k < partition.size(); k++) {
+                   c.push(partition.points[k]);
+                 }
+                
+                partition.points = c;
+                this.newCA = null;
+                this.newCB = null;
+           }
+      }
+  }
+  
+  this.addPoinSegment = function(pt) {
+          if(this.cidSegment != -1) {
+            var point = new Point2D(pt.x, pt.y);
+            
+                var partition = this.segmentsPartition[this.cidSegment];
+                for (var j = 0; j < partition.size(); j++) {
+                    var segment = partition.content[j];
+                    var d1 = point.distance(segment.p1);
+                    var d2 = point.distance(segment.p2);
+                    
+                    if(this.newA == null) {
+                      if(d1 <= canvas.pointSize) {
+                         this.newA = segment.p1;
+                         return;
+                      } else if(d2 <= canvas.pointSize) {
+                         this.newA = segment.p2;
+                         return;
+                      }
+                    } else if(this.newB == null) {
+                        if(d1 <= canvas.pointSize) {
+                           this.newB = segment.p1;
+                        } else if(d2 <= canvas.pointSize) {
+                           this.newB = segment.p2;
+                        }
+                    }
+                }
+                
+                if(this.newA != null && this.newB == null) {
+                    this.newB = point; //segment with new point
+                }
+                
+                if(this.newA != null && this.newB != null) {
+                    for (var j = 0; j < partition.size(); j++) {
+                        var segment = partition.content[j];
+                        var ns = new Segment2D(this.newA, this.newB);
+                        if(ns.equal(segment)) {
+                            var p = segment.p1.middle(segment.p2);
+                            var s1 = new Segment2D(segment.p1, p);
+                            var s2 = new Segment2D(p, segment.p2);
+                            var c = [];
+                            for (var k = 0; k < j; k++) {
+                               c.push(partition.content[k]);
+                            }
+                            c.push(s1);
+                            c.push(s2);
+                            for (var k = j+1; k < partition.size(); k++) {
+                               c.push(partition.content[k]);
+                            }
+                            partition.content = c;
+                            this.newA = null;
+                            this.newB = null;
+                            return;
+                        }
+                    }
+                    
+                    partition.addNewSegment(this.newA, this.newB);
+                    this.newA = null;
+                    this.newB = null;
+                }
+            }
+  }
+  
+  this.movePoint = function(pt) {
+    for (var i = 0; i < this.pointsPartition.length; i++) {
+      this.pointsPartition[i].movePoint(pt.x, pt.y);
+    }
+  }
+  
+  this.moveSegment = function(pt) {
+    for (var i = 0; i < this.segmentsPartition.length; i++) {
+      this.segmentsPartition[i].movePoint(pt.x, pt.y);
+    }
+  }
+  
+  this.moveCurve = function(pt) {
+    for (var i = 0; i < this.curvesPartition.length; i++) {
+      this.curvesPartition[i].movePoint(pt.x, pt.y);
+    }
+  }
+  
+  this.drawPoints = function() {
+    for (var i = 0; i < this.pointsPartition.length; i++) {
+      this.pointsPartition[i].draw();
+    }
+  }
+  
+  this.drawSegments = function() {
+    for (var i = 0; i < this.segmentsPartition.length; i++) {
+      this.segmentsPartition[i].draw();
+    }
+  }
+  
+  this.drawcurves = function() {
+    for (var i = 0; i < this.curvesPartition.length; i++) {
+      canvas.drawBezier(i, this.curvesPartition[i].points);
+    }
+  }
+  
+  this.createMOMFile = function() {
+    
+    for (var i = 0; i < this.pointsPartition.length; i++) {
+      this.MOM += this.pointsPartition[i].toMOM();
+    }
+    
+    for (var i = 0; i < this.segmentsPartition.length; i++) {
+      this.MOM += this.segmentsPartition[i].toMOM();
+    }
+    
+    for (var i = 0; i < this.curvesPartition.length; i++) {
+      this.MOM += this.curvesPartition[i].toMOM();
+    }
+    
+  }
+  
+  this.createYMLFile = function() {
+    
+  this.YML += '  MultiPoints: [' + '\n';
+  
+    if(this.pointsPartition.length == 1) {
+       this.YML += this.pointsPartition[0].toYML();
+    } else {
+      for (var i = 0; i < this.pointsPartition.length - 1; i++) {
+        if(this.pointsPartition[i].notEmpty()) {
+          this.YML += this.pointsPartition[i].toYML() + ", \n";
+        }
+      }
+      this.YML += this.pointsPartition[this.pointsPartition.length - 1].toYML();
+    }
+    
+     this.YML += "\n]\n";
+     
+     this.YML += '  MultiLineString: [' + '\n';
+     
+     var indexLine = 0;
+     
+
+        
+        for (var i = 0; i < this.segmentsPartition.length; i++) {
+          if(this.segmentsPartition[i].isLineString()) {
+            indexLine++;
+            if(indexLine == 1) {
+              this.YML += this.segmentsPartition[i].toYML();
+            } else {
+              if(this.segmentsPartition[i].notEmpty()) {
+                this.YML += ",\n" + this.segmentsPartition[i].toYML();
+              }
+            }
+          }
+        }
+        
+         var firstO = true;
+        
+          if(canvas.typeofcurve == "open") {
+            for (var i = 0; i < this.curvesPartition.length; i++) {
+              if(i < this.curvesPartition.length - 1) {
+                if(this.curvesPartition[i].notEmpty()) {
+                  if(firstO) {
+                    firstO = false;
+                    if(indexLine > 0) {
+                      this.YML += ",";
+                    }
+                    this.YML += "\n";
+                  }
+                  this.YML += this.curvesPartition[i].toYML() + ",\n";
+                }
+              } else {
+                 if(firstO) {
+                    firstO = false;
+                    if(indexLine > 0) {
+                      this.YML += ",";
+                    }
+                    this.YML += "\n";
+                  }
+                this.YML += this.curvesPartition[i].toYML() + "\n";
+              }
+              
+            }  
+          }
+     
+     
+     this.YML += "\n]\n";
+     
+     this.YML += '  MultiPolygon: [' + '\n';
+     
+      var indexPoly = 0;
+     
+        for (var i = 0; i < this.segmentsPartition.length; i++) {
+          if(this.segmentsPartition[i].isPolygon()) {
+            indexPoly++;
+            if(indexPoly == 1) {
+              this.YML += this.segmentsPartition[i].toYML();
+            } else {
+              if(this.segmentsPartition[i].notEmpty()) {
+              this.YML += ",\n" + this.segmentsPartition[i].toYML();
+              }
+            }
+          }
+        }
+        
+        var firstC = true;
+        
+         if(canvas.typeofcurve == "close") {
+            for (var i = 0; i < this.curvesPartition.length; i++) {
+            
+              if(i < this.curvesPartition.length - 1) {
+                if(this.curvesPartition[i].notEmpty()) {
+                  if(firstC) {
+                    firstC = false;
+                    if(indexPoly > 0) {
+                      this.YML += ",";
+                    }
+                    this.YML += "\n";
+                  }
+                  this.YML += this.curvesPartition[i].toYML() + ",\n";
+                }
+              } else {
+                
+                 if(firstC) {
+                    firstC = false;
+                    if(indexPoly > 0) {
+                      this.YML += ",";
+                    }
+                    this.YML += "\n";
+                  }
+                this.YML += this.curvesPartition[i].toYML() + "\n";
+              }
+            }  
+          }
+     
+     this.YML += "\n]\n";
+  }
+  
+  this.save = function() {
+    this.YML = "";
+    this.MOM = "";
+    this.createMOMFile();
+    this.createYMLFile();
+  }
+
 }
 
 //===========================================================================
@@ -1242,13 +1675,7 @@ $(document).keypress(function(e){
         } else if (key == "c") {
             actionChangeMode("drawCurve");
         } else if (canvas.started && key == "r") {
-              canvas.indexPoint2D = 0;
-              canvas.arrayPoint2D = [];
-              canvas.indexSegment2D = 0;
-              canvas.arraySegment2D = [];
-              canvas.firstSegment = true;
-              canvas.curve.size = 0;
-              canvas.curve.points = [];
+              canvas.newEnv();
               canvas.redraw();
         } else {
           
