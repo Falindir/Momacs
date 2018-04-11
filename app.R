@@ -17,9 +17,14 @@ library(stringr)
 library(shinyFiles)
 library(tools)
 library(shinyBS)
+library(colourpicker)
 
 source("./pages/page_def_home.R", local = T)
 source("./R/menugauche.R", local = T)
+
+configs <<- yaml.load_file("config.yml")$setting
+
+
 
 style <- tags$style(HTML(readLines("www/added_styles.css")) )
 UI <- dashboardPage(
@@ -30,7 +35,6 @@ UI <- dashboardPage(
     shinyjs::useShinyjs(),
     tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "bootstrap.min.readable.css")) ,
     tags$head(tags$script(src = "message-handler.js")),
-    tags$head(tags$script(src =  "config.js")),
     tags$head(tags$script(src =  "curves.js")),
     tags$head(style),
     tabItems(
@@ -41,6 +45,9 @@ UI <- dashboardPage(
 
 server <- function( input, output, session) {
   source("./server/opt_home.R", local=TRUE)
+  
+  session$sendCustomMessage(type = 'settings',
+                            message = configs)
 }
 
 shinyApp(ui = UI, server = server)

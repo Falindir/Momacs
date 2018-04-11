@@ -8,13 +8,15 @@
 
 $('#canvas').css('background-color', 'rgba(127, 140, 141, 0.2)');
 
+var momacs_config = null;
+
 var canvas = document.getElementById("canvas");
 canvas.started = false;
 canvas.width = 800;
 canvas.height = 600;
 canvas.state = "nothing";
 canvas.scaleFactor = 1.05;
-canvas.pointSize = momacs_config.size_point + momacs_config.size_hover;
+canvas.pointSize = 6; // default we change that in settings
 canvas.lastX=canvas.width/2;
 canvas.lastY=canvas.height/2;
 canvas.currentScale = 1;

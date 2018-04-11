@@ -1,3 +1,19 @@
+
+Shiny.addCustomMessageHandler("settings",
+
+  function(settings) {
+    
+    momacs_config = settings;
+    canvas.pointSize = momacs_config.size_point + momacs_config.size_hover;
+    
+    if(canvas.started ) {
+        canvas.redraw();
+    }
+  }
+
+);
+
+
 Shiny.addCustomMessageHandler("run",
   
   function(path_image) {

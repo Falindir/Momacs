@@ -1,0 +1,12 @@
+setting:
+  color_point: "#F52929"
+  color_segment: "#04C237"
+  color_curve: "#305DF0"
+  color_hover: "#8e44ad"
+  color_text: "#00838F"
+  size_point: "5"
+  size_hover: "3"
+  size_segment: "2"
+  size_curve: "2"
+  size_text: "10"
+

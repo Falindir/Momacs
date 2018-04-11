@@ -5,6 +5,8 @@ tabHome = fluidPage(
   #    textInput("pathImages", "Path to directory of images:")
   #),
   
+  
+  
   box(width = 9, 
       includeHTML(path = "./www/image.html")
   ),

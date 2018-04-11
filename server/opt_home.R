@@ -23,9 +23,7 @@ observeEvent(input$run, {
     }
     
     session$userData$listimages <- data.frame(name = ff, datapath=ffpath, havemom = logical(length = length(ffpath)))
-    
     session$userData$imageFiles <- session$userData$listimages[1,]
-    
     updateSelectInput(session, "selectimages", label = "Chose image:", choices = session$userData$listimages$name)
     
   } else {
@@ -33,6 +31,105 @@ observeEvent(input$run, {
     gestion_image(images)
   }
 
+})
+
+#====================================================================================
+
+observeEvent(input$sizePoint, {
+  
+  configs$size_point <<- input$sizePoint
+  
+  session$sendCustomMessage(type = 'settings',
+                            message = configs)
+})
+
+observeEvent(input$sizeSegment, {
+  
+  configs$size_segment <<- input$sizeSegment
+  
+  session$sendCustomMessage(type = 'settings',
+                            message = configs)
+})
+
+observeEvent(input$sizeCurve, {
+  
+  configs$size_curve <<- input$sizeCurve
+  
+  session$sendCustomMessage(type = 'settings',
+                            message = configs)
+})
+
+observeEvent(input$sizeTexte, {
+  
+  configs$size_text <<- input$sizeTexte
+  
+  session$sendCustomMessage(type = 'settings',
+                            message = configs)
+})
+
+observeEvent(input$colorPoint, {
+  
+  configs$color_point <<- input$colorPoint
+  
+  session$sendCustomMessage(type = 'settings',
+                            message = configs)
+})
+
+observeEvent(input$colorSegment, {
+  
+  configs$color_segment <<- input$colorSegment
+  
+  session$sendCustomMessage(type = 'settings',
+                            message = configs)
+})
+
+observeEvent(input$colorCurves, {
+  
+  configs$color_curve <<- input$colorCurves
+  
+  session$sendCustomMessage(type = 'settings',
+                            message = configs)
+})
+
+observeEvent(input$colorTextes, {
+  
+  configs$color_text <<- input$colorTextes
+  
+  session$sendCustomMessage(type = 'settings',
+                            message = configs)
+})
+
+
+
+observeEvent(input$saveSetting, {
+  
+  result <- "config.yml"
+  
+  if(file.exists(result)) {
+    file.remove(result)
+  }
+  
+  file.create(result);
+  
+  fileConn<-file(result)
+
+  txt <- paste0('setting:\n')
+  txt <- paste0(txt, '  color_point: "', configs$color_point, '"\n')
+  txt <- paste0(txt, '  color_segment: "', configs$color_segment, '"\n')
+  txt <- paste0(txt, '  color_curve: "', configs$color_curve, '"\n')
+  txt <- paste0(txt, '  color_hover: "', configs$color_hover, '"\n')
+  txt <- paste0(txt, '  color_text: "', configs$color_text, '"\n')
+  txt <- paste0(txt, '  size_point: "', configs$size_point, '"\n')
+  txt <- paste0(txt, '  size_hover: "', configs$size_hover, '"\n')
+  txt <- paste0(txt, '  size_segment: "', configs$size_segment, '"\n')
+  txt <- paste0(txt, '  size_curve: "', configs$size_curve, '"\n')
+  txt <- paste0(txt, '  size_text: "', configs$size_text, '"\n')
+  
+  writeLines(txt, fileConn)
+  close(fileConn)
+  
+  configs <<- yaml.load_file("config.yml")$setting
+  
 })
 
 #====================================================================================
@@ -106,53 +203,41 @@ observeEvent(input$loadI, {
 #====================================================================================
 
 observeEvent(input$nextI, {
-  
   if(!is.null(session$userData$listimages)) {
     session$sendCustomMessage(type = 'end', message = "next")
   }
-
 })
 
 #====================================================================================
 
 observeEvent(input$saveI, {
-  
   if(!is.null(session$userData$listimages)) {
     session$sendCustomMessage(type = 'end', message = "save")
   }
-  
 })
 
 #====================================================================================
 
 observeEvent(input$previousI, {
-
   if(!is.null(session$userData$listimages)) {
     session$sendCustomMessage(type = 'end', message = "previous")
   }
-  
 })
 
 #====================================================================================
 
 observeEvent(input$firstI, {
-  
   if(!is.null(session$userData$listimages)) {
     session$sendCustomMessage(type = 'end', message = "first")
   }
-  
 })
 
 #====================================================================================
 
 observeEvent(input$lastI, {
-  
   if(!is.null(session$userData$listimages)) {
-    
     session$sendCustomMessage(type = 'end', message = "last")
-  
   }
-  
 })
 
 #====================================================================================
@@ -336,11 +421,6 @@ observeEvent(input$endImage, {
       images <- session$userData$imageFiles
       
       updateSelectInput(session, "selectimages", label = "Chose image:", choices = session$userData$listimages$name, selected = session$userData$imageFiles$name)
-      
-      
-      
-      
-      
     } 
     
   } else if(input$endImage$typeevent == "previous") {
