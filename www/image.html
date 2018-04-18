@@ -1,4 +1,4 @@
-<div>
+<div id="containerC">
    <p id="mode"><b>Mode </b>: nothing</p>
    <p id="indeximagecanvas"><b>Images: </b> 0 / 0</p>
    <canvas id="canvas" width="800" height="600" style="cursor:crosshair;"></canvas>
@@ -27,6 +27,12 @@ var zone = null;
 var ctx = null;
 var ima1 = null;
 
+window.onresize = function(event) {
+  var box = document.getElementById("containerC");
+  canvas.width = box.offsetWidth;
+  canvas.height = box.offsetHeight;
+};
+
 window.onload = function(){ 
   
 document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
@@ -34,9 +40,15 @@ document.body.style.mozUserSelect = document.body.style.webkitUserSelect = docum
 ctx = canvas.getContext('2d');
 trackTransforms(ctx);
 
+var box = document.getElementById("containerC");
+canvas.width = box.offsetWidth;
+canvas.height = box.offsetHeight;
+
 zone = new ZoneP();
 
 //===========================================================================
+
+
 
 canvas.addEventListener('click',function(evt)
 {

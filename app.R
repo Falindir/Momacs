@@ -19,12 +19,10 @@ library(tools)
 library(shinyBS)
 library(colourpicker)
 
-source("./pages/page_def_home.R", local = T)
-source("./R/menugauche.R", local = T)
-
 configs <<- yaml.load_file("config.yml")$setting
 
-
+source("./pages/page_def_home.R", local = T)
+source("./R/menugauche.R", local = T)
 
 style <- tags$style(HTML(readLines("www/added_styles.css")) )
 UI <- dashboardPage(
@@ -44,6 +42,7 @@ UI <- dashboardPage(
 )
 
 server <- function( input, output, session) {
+
   source("./server/opt_home.R", local=TRUE)
   
   session$sendCustomMessage(type = 'settings',
