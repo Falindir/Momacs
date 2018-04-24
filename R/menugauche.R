@@ -2,6 +2,8 @@ MenuGauche = sidebarMenu(id = "sidebarmenu",
                          
                          menuItem("Home", tabName = "Home",  icon = icon("home", lib="font-awesome"), newtab = FALSE),
                          
+                         menuItem("Powered by mbb",  href = "http://mbb.univ-montp2.fr/MBB/index.php", newtab = TRUE, icon = icon("book", lib="font-awesome"), selected = NULL),
+                         
                          sliderInput("sizePoint", "Size points:", min=0.5, max=10, value=configs$size_point, step=0.5),
                          
                          sliderInput("sizeSegment", "Size segments:", min=0.5, max=10, value=configs$size_segment, step=0.5),
@@ -25,7 +27,6 @@ MenuGauche = sidebarMenu(id = "sidebarmenu",
                          tags$br(),
                          
                          menuItem("Powered by mbb",  href = "http://mbb.univ-montp2.fr/MBB/index.php", newtab = TRUE, icon = icon("book", lib="font-awesome"), selected = NULL),
-                         
                          
                          menuItem("Team", icon = icon("book", lib="font-awesome"),
                                   menuItem("Vincent Bonhomme",  href = "http://www.isem.univ-montp2.fr/recherche/equipes/phylogenie-et-evolution-moleculaire/personnel/douzery-emmanuel/", newtab = TRUE,     icon = shiny::icon("male"), selected = NULL  ),
