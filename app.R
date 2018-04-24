@@ -19,6 +19,7 @@ library(tools)
 library(shinyBS)
 library(colourpicker)
 
+# we load settings of momacs
 configs <<- yaml.load_file("config.yml")$setting
 
 source("./pages/page_def_home.R", local = T)

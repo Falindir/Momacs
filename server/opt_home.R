@@ -35,6 +35,7 @@ observeEvent(input$run, {
 
 #====================================================================================
 
+#' Event when input size point change
 observeEvent(input$sizePoint, {
   
   configs$size_point <<- input$sizePoint
@@ -43,6 +44,7 @@ observeEvent(input$sizePoint, {
                             message = configs)
 })
 
+#' Event when input size segment change
 observeEvent(input$sizeSegment, {
   
   configs$size_segment <<- input$sizeSegment
@@ -51,6 +53,7 @@ observeEvent(input$sizeSegment, {
                             message = configs)
 })
 
+#' Event when input size curve change
 observeEvent(input$sizeCurve, {
   
   configs$size_curve <<- input$sizeCurve
@@ -59,6 +62,7 @@ observeEvent(input$sizeCurve, {
                             message = configs)
 })
 
+#' Event when input size texte change
 observeEvent(input$sizeTexte, {
   
   configs$size_text <<- input$sizeTexte
@@ -67,6 +71,7 @@ observeEvent(input$sizeTexte, {
                             message = configs)
 })
 
+#' Event when input color background change
 observeEvent(input$colorBackground, {
   
   configs$color_background <<- input$colorBackground
@@ -75,6 +80,7 @@ observeEvent(input$colorBackground, {
                             message = configs)
 })
 
+#' Event when input color point change
 observeEvent(input$colorPoint, {
   
   configs$color_point <<- input$colorPoint
@@ -83,6 +89,7 @@ observeEvent(input$colorPoint, {
                             message = configs)
 })
 
+#' Event when input color segment change
 observeEvent(input$colorSegment, {
   
   configs$color_segment <<- input$colorSegment
@@ -91,6 +98,7 @@ observeEvent(input$colorSegment, {
                             message = configs)
 })
 
+#' Event when input color curve change
 observeEvent(input$colorCurves, {
   
   configs$color_curve <<- input$colorCurves
@@ -99,6 +107,7 @@ observeEvent(input$colorCurves, {
                             message = configs)
 })
 
+#' Event when input color texte change
 observeEvent(input$colorTextes, {
   
   configs$color_text <<- input$colorTextes
@@ -107,8 +116,7 @@ observeEvent(input$colorTextes, {
                             message = configs)
 })
 
-
-
+#' Event when use save settings button
 observeEvent(input$saveSetting, {
   
   result <- "config.yml"
@@ -211,46 +219,42 @@ gestion_image <- function(images) {
 
 #====================================================================================
 
+#' Event when use load button
 observeEvent(input$loadI, {
   images <- session$userData$imageFiles
   result2 <- paste0(file_path_sans_ext(images$datapath), ".yml");
   loadYamlFile(result2)
 })
 
-#====================================================================================
-
+#' Event when use next button
 observeEvent(input$nextI, {
   if(!is.null(session$userData$listimages)) {
     session$sendCustomMessage(type = 'end', message = "next")
   }
 })
 
-#====================================================================================
-
+#' Event when use save button
 observeEvent(input$saveI, {
   if(!is.null(session$userData$listimages)) {
     session$sendCustomMessage(type = 'end', message = "save")
   }
 })
 
-#====================================================================================
-
+#' Event when use previous button
 observeEvent(input$previousI, {
   if(!is.null(session$userData$listimages)) {
     session$sendCustomMessage(type = 'end', message = "previous")
   }
 })
 
-#====================================================================================
-
+#' Event when use first button
 observeEvent(input$firstI, {
   if(!is.null(session$userData$listimages)) {
     session$sendCustomMessage(type = 'end', message = "first")
   }
 })
 
-#====================================================================================
-
+#' Event when use last button
 observeEvent(input$lastI, {
   if(!is.null(session$userData$listimages)) {
     session$sendCustomMessage(type = 'end', message = "last")
@@ -277,6 +281,8 @@ observeEvent(input$selectimages, {
 
 #====================================================================================
 
+#' Get the os of MoMacs run
+#' @return string
 get_os <- function(){
   sysinf <- Sys.info()
   if (!is.null(sysinf)){
@@ -344,6 +350,8 @@ observeEvent(input$files, {
 
 #====================================================================================
 
+#' Load yml file
+#' @param yaml_file : Path of yml file
 loadYamlFile <- function(yaml_file) {
   
   if(file.exists(yaml_file)) {
@@ -360,6 +368,10 @@ loadYamlFile <- function(yaml_file) {
 
 #====================================================================================
 
+#' Save yml file
+#' @param images : 
+#' @param input : Input shiny
+#' @param result : the path of yml file
 saveYamlFile <- function (images, input, result) {
   
   if(file.exists(result)) {
@@ -384,6 +396,10 @@ saveYamlFile <- function (images, input, result) {
 
 #====================================================================================
 
+#' Save mom file
+#' @param images : 
+#' @param input : Input shiny
+#' @param result : the path of mom file
 saveMomFile <- function (images, input, result) {
   
   if(file.exists(result)) {
