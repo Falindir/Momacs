@@ -67,6 +67,14 @@ observeEvent(input$sizeTexte, {
                             message = configs)
 })
 
+observeEvent(input$colorBackground, {
+  
+  configs$color_background <<- input$colorBackground
+  
+  session$sendCustomMessage(type = 'settings',
+                            message = configs)
+})
+
 observeEvent(input$colorPoint, {
   
   configs$color_point <<- input$colorPoint
@@ -114,6 +122,7 @@ observeEvent(input$saveSetting, {
   fileConn<-file(result)
 
   txt <- paste0('setting:\n')
+  txt <- paste0(txt, '  color_background: "', configs$color_background, '"\n')
   txt <- paste0(txt, '  color_point: "', configs$color_point, '"\n')
   txt <- paste0(txt, '  color_segment: "', configs$color_segment, '"\n')
   txt <- paste0(txt, '  color_curve: "', configs$color_curve, '"\n')

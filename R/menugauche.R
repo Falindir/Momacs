@@ -10,6 +10,8 @@ MenuGauche = sidebarMenu(id = "sidebarmenu",
                          
                          sliderInput("sizeTexte", "Size textes:", min=1, max=20, value=configs$size_text, step=1),
                          
+                         colourInput("colorBackground", "Colour background:", configs$color_background),
+                         
                          colourInput("colorPoint", "Colour points:", configs$color_point),
                          
                          colourInput("colorSegment", "Colour segments:", configs$color_segment),

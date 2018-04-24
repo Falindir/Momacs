@@ -1,4 +1,5 @@
 setting:
+  color_background: "#D1D1D1"
   color_point: "#F52929"
   color_segment: "#04C237"
   color_curve: "#305DF0"

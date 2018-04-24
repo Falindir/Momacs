@@ -253,6 +253,7 @@ canvas.addEventListener('mousewheel',handleScroll,false);
 
 canvas.redraw = function ()
 {
+          $('#canvas').css('background-color', momacs_config.color_background);
           var p1 = ctx.transformedPoint(0,0);
           var p2 = ctx.transformedPoint(this.width,this.height);
           ctx.clearRect(p1.x,p1.y,p2.x-p1.x,p2.y-p1.y);
