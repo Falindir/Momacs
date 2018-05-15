@@ -22,7 +22,11 @@ library(colourpicker)
 # we load settings of momacs
 configs <<- yaml.load_file("config.yml")$setting
 
+# we load shortcut of momacs
+shortcut <<- yaml.load_file("shortcut.yml")$shortcut
+
 source("./pages/page_def_home.R", local = T)
+source("./pages/page_def_shortcut.R", local = T)
 source("./R/menugauche.R", local = T)
 
 style <- tags$style(HTML(readLines("www/added_styles.css")) )
@@ -37,17 +41,24 @@ UI <- dashboardPage(
     tags$head(tags$script(src =  "curves.js")),
     tags$head(style),
     tabItems(
-      tabItem(tabName = "Home",         tabHome)
+      tabItem(tabName = "Home",         tabHome),
+      tabItem(tabName = "Shortcut",         tabShortcut)
     )
   )
 )
 
 server <- function( input, output, session) {
-
-  source("./server/opt_home.R", local=TRUE)
   
+  source("./server/opt_home.R", local=TRUE)
+  source("./server/opt_shortcut.R", local=TRUE)
+  
+  # send setting event to javascript
   session$sendCustomMessage(type = 'settings',
                             message = configs)
+  
+  # send shortcut event to javascript
+  session$sendCustomMessage(type = 'shortcut',
+                            message = shortcut)
 }
 
 shinyApp(ui = UI, server = server)

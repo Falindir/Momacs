@@ -2,6 +2,8 @@ MenuGauche = sidebarMenu(id = "sidebarmenu",
                          
                          menuItem("Home", tabName = "Home",  icon = icon("home", lib="font-awesome"), newtab = FALSE),
                          
+                         menuItem("Shortcut", tabName = "Shortcut",  icon = icon("key", lib="font-awesome"), newtab = FALSE),
+                         
                          menuItem("Powered by mbb",  href = "http://mbb.univ-montp2.fr/MBB/index.php", newtab = TRUE, icon = icon("book", lib="font-awesome"), selected = NULL),
                          
                          sliderInput("sizePoint", "Size points:", min=0.5, max=10, value=configs$size_point, step=0.5),

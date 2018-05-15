@@ -8,7 +8,11 @@
 
 $('#canvas').css('background-color', 'rgba(127, 140, 141, 0.2)');
 
+/** configs of momacs **/
 var momacs_config = null;
+
+/** shortcut of momacs **/
+var momacs_shortcut = null;
 
 var canvas = document.getElementById("canvas");
 /* If load images started */
@@ -348,7 +352,7 @@ canvas.changeMode = function(mode) {
 /**
  * For change the current mode
  **/
-var actionChangeMode = function(mode) {
+canvas.actionChangeMode = function(mode) {
   if(canvas.started) {
     if(canvas.state == mode) {
       canvas.state = "nothing";
@@ -361,18 +365,18 @@ var actionChangeMode = function(mode) {
 
 //===========================================================================
 
-$("#buttonMoveImage").click(function(e){ actionChangeMode("move"); });
-$("#buttonDrawPoint").click(function(e){ actionChangeMode("drawPoint"); });
-$("#buttonDrawSegment").click(function(e){ actionChangeMode("drawSegment"); });
-$("#buttonDrawCurve").click(function(e){ actionChangeMode("drawCurve"); });
-$("#buttonDeletePoint").click(function(e){ actionChangeMode("deletePoint"); });
-$("#buttonDeletePointSegment").click(function(e){ actionChangeMode("deletePointSegment"); });
-$("#buttonDeletePointCurve").click(function(e){ actionChangeMode("deletePointCurve"); });
-$("#buttonMovePoint").click(function(e){ actionChangeMode("movePoint"); });
-$("#buttonMovePointSegment").click(function(e){ actionChangeMode("movePointSegment"); });
-$("#buttonMovePointCurve").click(function(e){ actionChangeMode("movePointCurve"); });
-$("#buttonAddPointOnSegment").click(function(e){ actionChangeMode("addPointOnSegment"); });
-$("#buttonAddPointOnCurve").click(function(e){ actionChangeMode("addPointOnCurve"); });
+$("#buttonMoveImage").click(function(e){ canvas.actionChangeMode("move"); });
+$("#buttonDrawPoint").click(function(e){ canvas.actionChangeMode("drawPoint"); });
+$("#buttonDrawSegment").click(function(e){ canvas.actionChangeMode("drawSegment"); });
+$("#buttonDrawCurve").click(function(e){ canvas.actionChangeMode("drawCurve"); });
+$("#buttonDeletePoint").click(function(e){ canvas.actionChangeMode("deletePoint"); });
+$("#buttonDeletePointSegment").click(function(e){ canvas.actionChangeMode("deletePointSegment"); });
+$("#buttonDeletePointCurve").click(function(e){ canvas.actionChangeMode("deletePointCurve"); });
+$("#buttonMovePoint").click(function(e){ canvas.actionChangeMode("movePoint"); });
+$("#buttonMovePointSegment").click(function(e){ canvas.actionChangeMode("movePointSegment"); });
+$("#buttonMovePointCurve").click(function(e){ canvas.actionChangeMode("movePointCurve"); });
+$("#buttonAddPointOnSegment").click(function(e){ canvas.actionChangeMode("addPointOnSegment"); });
+$("#buttonAddPointOnCurve").click(function(e){ canvas.actionChangeMode("addPointOnCurve"); });
 
 //===========================================================================
 
@@ -437,11 +441,7 @@ $("#clearImage").click(function(e){
  * Event when use clear current point partition button 
  **/
 $("#buttonClearPartitionPoint").click(function(e){
-    if(canvas.started) {
-        var part = zone.pointsPartition[zone.cidPoint];
-        zone.pointsPartition[zone.cidPoint] = new Partition(part.id);
-        canvas.redraw();
-    }
+  zone.clearPointPartition();
 });
 
 //===========================================================================
@@ -450,11 +450,7 @@ $("#buttonClearPartitionPoint").click(function(e){
  * Event when use clear current segment partition button
  **/
 $("#buttonClearPartitionSegment").click(function(e){
-    if(canvas.started) {
-        var part = zone.segmentsPartition[zone.cidSegment];
-        zone.segmentsPartition[zone.cidSegment] = new SegmentPartition(part.id);
-        canvas.redraw();
-    }
+  zone.clearSegmentPartition();
 });
 
 //===========================================================================
@@ -463,11 +459,7 @@ $("#buttonClearPartitionSegment").click(function(e){
  * Event when use clear current curve partition button
  **/
 $("#buttonClearPartitionCurve").click(function(e){
-    if(canvas.started) {
-        var part = zone.curvesPartition[zone.cidCurve];
-        zone.curvesPartition[zone.cidCurve] = new Curve2D(part.id);
-        canvas.redraw();
-    }
+  zone.clearCurvePartition();
 });
 
 //===========================================================================
@@ -476,13 +468,7 @@ $("#buttonClearPartitionCurve").click(function(e){
  * Event when use new point partition button
  **/ 
 $("#buttonNewPartitionPoint").click(function(e){
-  if(canvas.started) {
-    var x = document.getElementById("selectedPartitionPoint");
-    var id = zone.pointsPartition.length;
-    canvas.addOptionToList(x, "P"+id);
-    zone.pointsPartition[id] = new Partition(id);
-    zone.cidPoint = id;
-  }
+  zone.newPointPartition();
 });
 
 //===========================================================================
@@ -491,13 +477,7 @@ $("#buttonNewPartitionPoint").click(function(e){
  * Event when use new segment partition button
  **/ 
 $("#buttonNewPartitionSegment").click(function(e){
-  if(canvas.started) {
-    var x = document.getElementById("selectedPartitionSegment");
-    var id = zone.segmentsPartition.length;
-    canvas.addOptionToList(x, "S"+id);
-    zone.segmentsPartition[id] = new SegmentPartition(id);
-    zone.cidSegment = id;
-  }
+  zone.newSegmentPartition();
 });
 
 //===========================================================================
@@ -506,13 +486,7 @@ $("#buttonNewPartitionSegment").click(function(e){
  * Event when use new curve partition button
  **/ 
 $("#buttonNewPartitionCurve").click(function(e){
-  if(canvas.started) {
-    var x = document.getElementById("selectedPartitionCurve");
-    var id = zone.curvesPartition.length;
-    canvas.addOptionToList(x, "C"+id);
-    zone.curvesPartition[id] = new Curve2D(id);
-    zone.cidCurve = id;
-  }
+  zone.newCurvePartition();
 });
 
 //===========================================================================
@@ -521,36 +495,7 @@ $("#buttonNewPartitionCurve").click(function(e){
  * Event when use delete point partition button
  **/ 
 $("#buttonDeletePartitionPoint").click(function(e){
-  if(canvas.started) {
-    var conceptName = $('#selectedPartitionPoint').find(":selected").text();
-    var option = "#selectedPartitionPoint option[value='"+conceptName+"']";
-    $(option).remove();
-    var id = conceptName.substring(1);
-    var collectionPoint = [];
-    var j = 0;
-    for (var i = 0; i < zone.pointsPartition.length; i++) {
-      var partition = zone.pointsPartition[i];
-      if(partition.id != id) {
-        collectionPoint[j] = partition;
-        j++;
-      } else {
-        collectionPoint[j] = new Partition(id);
-        collectionPoint[j].alive = false;
-        j++;
-      }
-    }
-    zone.pointsPartition = collectionPoint;
-    
-    zone.cidPoint = -1;
-    for (var i = 0; i < zone.pointsPartition.length; i++) {
-      if(zone.pointsPartition[i].alive) {
-        zone.cidPoint = i;
-        break;
-      }
-    }
-  
-    canvas.redraw();
-  }
+  zone.deletePointPartition();
 });
 
 //===========================================================================
@@ -559,37 +504,7 @@ $("#buttonDeletePartitionPoint").click(function(e){
  * Event when use delete segment partition button
  **/ 
 $("#buttonDeletePartitionSegment").click(function(e){
-  if(canvas.started) {
-    var conceptName = $('#selectedPartitionSegment').find(":selected").text();
-    var option = "#selectedPartitionSegment option[value='"+conceptName+"']";
-    $(option).remove();
-    var id = conceptName.substring(1);
-    var collectionSegment = [];
-    var j = 0;
-    for (var i = 0; i < zone.segmentsPartition.length; i++) {
-      var partition = zone.segmentsPartition[i];
-      if(partition.id != id) {
-        collectionSegment[j] = partition;
-        j++;
-      } else {
-        collectionSegment[j] = new SegmentPartition(id);
-        collectionSegment[j].alive = false;
-        j++;
-      }
-    }
-    
-    zone.segmentsPartition = collectionSegment;
-
-    zone.cidSegment = -1;
-    for (var i = 0; i < zone.segmentsPartition.length; i++) {
-      if(zone.segmentsPartition[i].alive) {
-        zone.cidSegment = i;
-        break;
-      }
-    }
-
-    canvas.redraw();
-  }
+  zone.deleteSegmentPartition();
 });
 
 //===========================================================================
@@ -598,35 +513,7 @@ $("#buttonDeletePartitionSegment").click(function(e){
  * Event when use delete curve partition button
  **/ 
 $("#buttonDeletePartitionCurve").click(function(e){
-  if(canvas.started) {
-    var conceptName = $('#selectedPartitionCurve').find(":selected").text();
-    var option = "#selectedPartitionCurve option[value='"+conceptName+"']";
-    $(option).remove();
-    var id = conceptName.substring(1);
-    var collectionCurve = [];
-    var j = 0;
-    for (var i = 0; i < zone.curvesPartition.length; i++) {
-      var partition = zone.curvesPartition[i];
-      if(partition.id != id) {
-        collectionCurve[j] = partition;
-        j++;
-      } else {
-        collectionCurve[j] = new Curve2D(id);
-        collectionCurve[j].alive = false;
-        j++;
-      }
-    }
-    zone.curvesPartition = collectionCurve;
-    
-    zone.cidCurve = -1;
-    for (var i = 0; i < zone.curvesPartition.length; i++) {
-      if(zone.curvesPartition[i].alive) {
-        zone.cidCurve = i;
-        break;
-      }
-    }
-    canvas.redraw();
-  }
+  zone.deleteCurvePartition();
 });
 
 //===========================================================================
@@ -1248,7 +1135,7 @@ var SegmentPartition = function(id) {
                     
                 } 
                            
-                if(i == this.size() - 1) { //last element
+                if(j == this.size() - 1) { //last element
                     if(!p2.equal(this.content[j].p1)) {
                         if(p2.printed) {
                           canvas.drawText(value+index, p2.x, p2.y);
@@ -1879,6 +1766,186 @@ var ZoneP = function () {
   }
   
   /**
+   * Use for create new point partition
+   **/
+  this.newPointPartition = function()  {
+    if(canvas.started) {
+      var x = document.getElementById("selectedPartitionPoint");
+      var id = zone.pointsPartition.length;
+      canvas.addOptionToList(x, "P"+id);
+      zone.pointsPartition[id] = new Partition(id);
+      zone.cidPoint = id;
+    }
+  }
+  
+  /**
+   * Use for create new point partition
+   **/
+  this.newSegmentPartition = function() {
+    if(canvas.started) {
+      var x = document.getElementById("selectedPartitionSegment");
+      var id = zone.segmentsPartition.length;
+      canvas.addOptionToList(x, "S"+id);
+      zone.segmentsPartition[id] = new SegmentPartition(id);
+      zone.cidSegment = id;
+    }
+  }
+  
+  /**
+   * Use for create new curve partition
+   **/
+  this.newCurvePartition = function() {
+    if(canvas.started) {
+      var x = document.getElementById("selectedPartitionCurve");
+      var id = zone.curvesPartition.length;
+      canvas.addOptionToList(x, "C"+id);
+      zone.curvesPartition[id] = new Curve2D(id);
+      zone.cidCurve = id;
+    }
+  }
+  
+  /**
+   * Use for clear current point partition
+   **/
+  this.clearPointPartition = function() {
+      if(canvas.started) {
+          var part = this.pointsPartition[this.cidPoint];
+          this.pointsPartition[this.cidPoint] = new Partition(part.id);
+          canvas.redraw();
+      }
+  }
+  
+  /**
+   * Use for clear current segment partition
+   **/
+  this.clearSegmentPartition = function() {
+      if(canvas.started) {
+          var part = zone.segmentsPartition[zone.cidSegment];
+          zone.segmentsPartition[zone.cidSegment] = new SegmentPartition(part.id);
+          canvas.redraw();
+      }
+  }
+  
+  /**
+   * Use for clear current curve partition
+   **/
+  this.clearCurvePartition = function() {
+      if(canvas.started) {
+          var part = zone.curvesPartition[zone.cidCurve];
+          zone.curvesPartition[zone.cidCurve] = new Curve2D(part.id);
+          canvas.redraw();
+      }
+  }
+  
+  /**
+   * Use for delete current point partition
+   **/
+  this.deletePointPartition = function() {
+    if(canvas.started) {
+      var conceptName = $('#selectedPartitionPoint').find(":selected").text();
+      var option = "#selectedPartitionPoint option[value='"+conceptName+"']";
+      $(option).remove();
+      var id = conceptName.substring(1);
+      var collectionPoint = [];
+      var j = 0;
+      for (var i = 0; i < zone.pointsPartition.length; i++) {
+        var partition = zone.pointsPartition[i];
+        if(partition.id != id) {
+          collectionPoint[j] = partition;
+          j++;
+        } else {
+          collectionPoint[j] = new Partition(id);
+          collectionPoint[j].alive = false;
+          j++;
+        }
+      }
+      zone.pointsPartition = collectionPoint;
+      
+      zone.cidPoint = -1;
+      for (var i = 0; i < zone.pointsPartition.length; i++) {
+        if(zone.pointsPartition[i].alive) {
+          zone.cidPoint = i;
+          break;
+        }
+      }
+    
+      canvas.redraw();
+    }
+  }
+  
+  /**
+   * Use for delete current segment partition
+   **/
+  this.deleteSegmentPartition = function() {
+    if(canvas.started) {
+      var conceptName = $('#selectedPartitionSegment').find(":selected").text();
+      var option = "#selectedPartitionSegment option[value='"+conceptName+"']";
+      $(option).remove();
+      var id = conceptName.substring(1);
+      var collectionSegment = [];
+      var j = 0;
+      for (var i = 0; i < zone.segmentsPartition.length; i++) {
+        var partition = zone.segmentsPartition[i];
+        if(partition.id != id) {
+          collectionSegment[j] = partition;
+          j++;
+        } else {
+          collectionSegment[j] = new SegmentPartition(id);
+          collectionSegment[j].alive = false;
+          j++;
+        }
+      }
+      
+      zone.segmentsPartition = collectionSegment;
+  
+      zone.cidSegment = -1;
+      for (var i = 0; i < zone.segmentsPartition.length; i++) {
+        if(zone.segmentsPartition[i].alive) {
+          zone.cidSegment = i;
+          break;
+        }
+      }
+  
+      canvas.redraw();
+    }
+  }
+  
+  /**
+   * Use for delete current curve partition
+   **/
+  this.deleteCurvePartition = function() {
+    if(canvas.started) {
+      var conceptName = $('#selectedPartitionCurve').find(":selected").text();
+      var option = "#selectedPartitionCurve option[value='"+conceptName+"']";
+      $(option).remove();
+      var id = conceptName.substring(1);
+      var collectionCurve = [];
+      var j = 0;
+      for (var i = 0; i < zone.curvesPartition.length; i++) {
+        var partition = zone.curvesPartition[i];
+        if(partition.id != id) {
+          collectionCurve[j] = partition;
+          j++;
+        } else {
+          collectionCurve[j] = new Curve2D(id);
+          collectionCurve[j].alive = false;
+          j++;
+        }
+      }
+      zone.curvesPartition = collectionCurve;
+      
+      zone.cidCurve = -1;
+      for (var i = 0; i < zone.curvesPartition.length; i++) {
+        if(zone.curvesPartition[i].alive) {
+          zone.cidCurve = i;
+          break;
+        }
+      }
+      canvas.redraw();
+    }
+  }
+
+  /**
    * Generate the content of mom file
    **/
   this.createMOMFile = function() {
@@ -2038,21 +2105,75 @@ var ZoneP = function () {
 $(document).keypress(function(e){
  
         var key = e.originalEvent.key;
-      
-        if(key == "p") {
-            actionChangeMode("drawPoint");
-        } else if(key == "m") {
-            actionChangeMode("move");
-        } else if (key == "s") {
-            actionChangeMode("drawSegment");
-        } else if (key == "c") {
-            actionChangeMode("drawCurve");
-        } else if (canvas.started && key == "r") {
-              canvas.newEnv();
-              canvas.redraw();
+        
+        // console.log(key);
+
+        if(key == momacs_shortcut.drawPoint) {
+            canvas.actionChangeMode("drawPoint");
+        } else if(key == momacs_shortcut.move) {
+            canvas.actionChangeMode("move");
+        } else if (key == momacs_shortcut.drawSegment) {
+            canvas.actionChangeMode("drawSegment");
+        } else if (key == momacs_shortcut.drawCurve) {
+            canvas.actionChangeMode("drawCurve");
+        } else if (canvas.started && key == momacs_shortcut.nextI) {
+          // we send nextI event to shiny
+          // random number for change value of event also for shiny is not new event
+          Shiny.onInputChange("nextI", Math.random());
+        } else if (canvas.started && key == momacs_shortcut.last) {
+          // we send lastI event to shiny
+          // random number for change value of event also for shiny is not new event
+          Shiny.onInputChange("lastI", Math.random());
+        } else if (canvas.started && key == momacs_shortcut.previous) {
+          // we send previousI event to shiny
+          // random number for change value of event also for shiny is not new event
+          Shiny.onInputChange("previousI", Math.random());
+        } else if (canvas.started && key == momacs_shortcut.first) {
+          // we send firstI event to shiny
+          // random number for change value of event also for shiny is not new event
+          Shiny.onInputChange("firstI", Math.random());
+        } else if (canvas.started && key == momacs_shortcut.save) {
+          // we send saveI event to shiny
+          // random number for change value of event also for shiny is not new event
+          Shiny.onInputChange("saveI", Math.random());
+        } else if(key == momacs_shortcut.movePoint) {
+            canvas.actionChangeMode("movePoint");
+        } else if (key == momacs_shortcut.moveSegment) {
+            canvas.actionChangeMode("movePointSegment");
+        } else if (key == momacs_shortcut.moveCurve) {
+            canvas.actionChangeMode("movePointCurve");
+        } else if(key == momacs_shortcut.deletePoint) {
+            canvas.actionChangeMode("deletePoint");
+        } else if (key == momacs_shortcut.deleteSegment) {
+            canvas.actionChangeMode("deletePointSegment");
+        } else if (key == momacs_shortcut.deleteCurve) {
+            canvas.actionChangeMode("deletePointCurve");
+        } else if (key == momacs_shortcut.newPointPartition) {
+            zone.newPointPartition();
+        } else if (key == momacs_shortcut.newSegmentPartition) {
+            zone.newSegmentPartition();
+        } else if (key == momacs_shortcut.newCurvePartition) {
+            zone.newCurvePartition();
+        } else if (key == momacs_shortcut.deletePointPartition) {
+            zone.deletePointPartition();
+        } else if (key == momacs_shortcut.deleteSegmentPartition) {
+            zone.deleteSegmentPartition();
+        } else if (key == momacs_shortcut.deleteCurvePartition) {
+            zone.deleteCurvePartition();
+        } else if (key == momacs_shortcut.clearPointPartition) {
+            zone.clearPointPartition();
+        } else if (key == momacs_shortcut.clearSegmentPartition) {
+            zone.clearSegmentPartition();
+        } else if (key == momacs_shortcut.clearCurvePartition) {
+            zone.clearCurvePartition();
+        } else if (key == momacs_shortcut.addPointOnSegment) {
+            canvas.actionChangeMode("addPointOnSegment");
+        } else if (key == momacs_shortcut.addPointOnCurve) {
+            canvas.actionChangeMode("addPointOnCurve");
         } else {
-          
+          // nothing
         }
+        
 });
 
 //===========================================================================
