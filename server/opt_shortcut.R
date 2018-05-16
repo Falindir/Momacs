@@ -37,7 +37,7 @@ observeEvent(input$saveShortcut, {
   txt <- paste0(txt, '  clearPointPartition: "', input$clearPointPartitionSC, '"\n')
   txt <- paste0(txt, '  clearSegmentPartition: "', input$clearSegmentPartitionSC, '"\n')
   txt <- paste0(txt, '  clearCurvePartition: "', input$clearCurvePartitionSC, '"\n')
-  txt <- paste0(txt, '  addPointOnSegment: "', input$addPointOnCurveSC, '"\n')
+  txt <- paste0(txt, '  addPointOnSegment: "', input$addPointOnSegmentSC, '"\n')
   txt <- paste0(txt, '  addPointOnCurve: "', input$addPointOnCurveSC, '"\n')
   
   writeLines(txt, fileConn)

@@ -17,10 +17,13 @@ var momacs_shortcut = null;
 var canvas = document.getElementById("canvas");
 /* If load images started */
 canvas.started = false;
+// default width of canvas
 canvas.width = 800;
+// default height of canvas
 canvas.height = 600;
 /* Current state of app */
 canvas.state = "nothing";
+// zoom scale
 canvas.scaleFactor = 1.05;
 canvas.pointSize = 6; // default we change that in settings
 canvas.lastX=canvas.width/2;
@@ -364,6 +367,10 @@ canvas.actionChangeMode = function(mode) {
 }
 
 //===========================================================================
+
+/**
+ * All events on button we need javascript action
+ **/
 
 $("#buttonMoveImage").click(function(e){ canvas.actionChangeMode("move"); });
 $("#buttonDrawPoint").click(function(e){ canvas.actionChangeMode("drawPoint"); });
@@ -882,9 +889,13 @@ var Segment2D = function (p1, p2) {
  * Object Curve2D
  **/
 var Curve2D = function (id) {
+   // the identifiant
    this.id = id;
-   this.points = []; // array of Point2D
-   this.allpts = null; // array of all points generate for draw curve 
+   // array of Point2D
+   this.points = [];
+   // array of all points generate for draw curve 
+   this.allpts = null; 
+   // if alive equal false we need destroy this partition
    this.alive = true;
    
    /**
@@ -1036,9 +1047,13 @@ var Curve2D = function (id) {
  * Object SegmentPartition
  **/
 var SegmentPartition = function(id) {
+   // the identifiant 
    this.id = id;
-   this.content = []; // arrays of Segment2D
-   this.firstSegment = true; //if first segment is complete (with 2 points)
+   // arrays of Segment2D
+   this.content = [];
+   //if first segment is complete (with 2 points)
+   this.firstSegment = true;
+   // if alive equal false we need destroy this partition 
    this.alive = true;
    
    /**
@@ -1333,8 +1348,11 @@ var SegmentPartition = function(id) {
  * Object Partition
  **/
 var Partition = function (id) {
+   // the identifiant 
    this.id = id;
+   // array of Point2D
    this.content = [];
+   // if alive equal false we need destroy this partition 
    this.alive = true;
    
    /**
@@ -1485,17 +1503,29 @@ var ZoneP = function () {
   // array of curve partition
   this.curvesPartition = [];
   
+  // the starting point of the movement
   this.dragStart = null;
+  
+  // the point to move in movement
   this.draggedPoint = null;
   
+  // when use button point on segment is the first point 
   this.newA = null;
+  // when use button point on segment is the second point 
   this.newB = null;
   
+  // when use button point on curve is the first point 
   this.newCA = null;
+  // when use button point on curve is the second point 
   this.newCB = null;
   
+  // collection point partition
   this.pointsPartition[0] = new Partition(0);
+  
+  // collection segment partition
   this.segmentsPartition[0] = new SegmentPartition(0);
+  
+  // collection curve partition
   this.curvesPartition[0] = new Curve2D(0);
   
   /**
