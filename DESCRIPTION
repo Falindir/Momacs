@@ -1,0 +1,27 @@
+Package: Momacs
+Version: 0.0.0.9000
+Title: Acquisition of morphometrics data in R
+Description: What the package does (one paragraph).
+Authors@R: c(person("Vincent", "Bonhomme", , "bonhomme.vincent@gmail.com", c("aut", "cre")),
+             person("Jimmy", "Lopez", , "jimmy.lopez@umontpellier.fr", c("aut")))
+License: GPL-3
+Encoding: UTF-8
+URL: https://github.com/MomX/Momacs/
+BugReports: https://github.com/MomX/Momacs/issues
+LazyData: true
+ByteCompile: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 6.0.1
+Depends: R (>= 3.4.0)
+Imports:
+    downloader,
+    shiny,
+    shinyBS,
+    shinydashboard,
+    shinyFiles,
+    shinyjs,
+    tools,
+    yaml
+Suggests:
+    covr,
+    testthat

@@ -1,0 +1,61 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+## Momacs <img src="https://noto-website-2.storage.googleapis.com/emoji/emoji_u26cf.png" width="30px">
+_Part of [MomX](https://momx.github.io/MomX/)_
+
+<!--Badges -->
+[![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![Travis build status](https://travis-ci.org/MomX/Momacs.svg?branch=master)](https://travis-ci.org/MomX/Momacs)
+[![Coverage status](https://codecov.io/gh/MomX/Momacs/branch/master/graph/badge.svg)](https://codecov.io/github/MomX/Momacs?branch=master)
+[![CRAN status](https://www.r-pkg.org/badges/version/Momacs)](https://cran.r-project.org/package=Momacs)
+![CRAN downloads last month](http://cranlogs.r-pkg.org/badges/Momacs) ![CRAN downloads grand total](http://cranlogs.r-pkg.org/badges/grand-total/Momacs)
+
+Momacs is a digitalization interface for 2D morphometrics data. It is intentend as an open-source alternative to tpsDig, in R. So far, it is quite experimental and it is part of the [MomX](https://momx.github.io/MomX/) ecosystem.
+
+Momacs benefited from the [Montpellier Bioinformatics Biodiversity](http://mbb.univ-montp2.fr/) platform services. 
+
+### Installation
+The last released version can be installed from [CRAN](https://CRAN.R-project.org/package=Momacs ) with (NOT YET RELEASED!):
+
+```{r cran-installation, eval = FALSE}
+install.packages("Momacs")
+```
+
+But I recommend using (and only support) the development version from GitHub with:
+```{r gh-installation, eval = FALSE}
+# install.packages("devtools")
+devtools::install_github("MomX/Momacs")
+```
+
+### Features
+For supported images ("jpeg", "gif", "bmp", "png", "jpg") the following 2D features can be acquired:
+
+* Batch of images that can be zoomed, moved, etc.
+* Landmarks
+* Open/closed curves/polygons
+* Configurable shortcuts and cosmetics
+
+### Planned
+
+* Better looking and more productive user interface
+* Bezier curves
+* Integration of outlines
+* Post treatment of images, possibly using [Momoshop](https://github.com/vbonhomme/Momoshop)
+
+## Screenshots
+
+----
+Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md).
+By participating in this project you agree to abide by its terms.
