@@ -7,7 +7,7 @@
 go()
 }
 \value{
-shiny application object
+void
 }
 \description{
 launches the shinyAppDemo app
@@ -16,5 +16,4 @@ launches the shinyAppDemo app
 \dontrun{
 go()
 }
-
 }

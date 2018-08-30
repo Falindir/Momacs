@@ -1,13 +1,8 @@
 #' launches the shinyAppDemo app
 #'
 #'
-#' @return shiny application object
-#'
-#' @examples
-#' \dontrun{
-#' go()
-#' }
-#'
+#' @return void
+#' @import colourpicker
 #' @import shiny
 #' @import downloader
 #' @import httpuv
@@ -18,13 +13,12 @@
 #' @import tools
 #' @import yaml
 #'
-#' @export go
+#' @examples
+#' \dontrun{
+#' go()
+#' }
 go <- function() {
-  shiny::shinyApp(ui = ui, server = server)
+  shiny::runApp("inst/momacs_shiny/")
 }
-
-
-# prevents "no visible binding for global variable"
-globalVariables(c("configs", "shortcut"))
 
 

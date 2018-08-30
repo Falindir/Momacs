@@ -13,8 +13,12 @@ ByteCompile: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.0.1
 Depends: R (>= 3.4.0)
+Author: Vincent Bonhomme [aut, cre],
+  Jimmy Lopez [aut]
 Imports:
+    colourpicker,
     downloader,
+    httpuv,
     shiny,
     shinyBS,
     shinydashboard,
