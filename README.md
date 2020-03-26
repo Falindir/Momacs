@@ -1,9 +1,9 @@
 
 ## Momacs
 
-<!--<a href='http://momx.github.io/Momacs'><img src='man/figures/logo.png' align="right" height="140" /></a>))>
-
 *Part of [MomX](https://momx.github.io/MomX/)*
+<!--<a href='http://momx.github.io/Momacs'><img src='man/figures/logo.png' align="right" height="140" /></a> -->
+
 
 <!-- badges: start -->
 
