@@ -1,11 +1,13 @@
-url: http://momx.github.io/Momacs/
+destination: docs
+
+url: http://momx.github.io/Momacs
 
 template:
   params:
-    bootswatch: flatly
+    bootswatch: cosmo
 
 home:
-  strip_header: false
+  strip_header: true
 
 navbar:
   type: default
@@ -16,3 +18,10 @@ navbar:
 authors:
   Vincent Bonhomme:
     href: http://www.vincentbonhomme.fr
+
+
+reference:
+  - title: "shiny apps"
+    desc: ""
+    contents:
+      - acquire

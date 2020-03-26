@@ -1,7 +1,7 @@
 <div id="containerC">
-   <p id="mode"><b>Mode </b>: nothing</p>
+   <p id="mode"><b>Mode </b>: waiting</p>
    <p id="indeximagecanvas"><b>Images: </b> 0 / 0</p>
-   <canvas id="canvas" width="800" height="600" style="cursor:crosshair;"></canvas>
+   <canvas id="canvas" width="900" height="600" style="cursor:crosshair;"></canvas>
 </div>
 
 <script>
@@ -45,10 +45,10 @@ window.onresize = function(event) {
   canvas.height = box.offsetHeight;
 };
 
-window.onload = function(){ 
-  
+window.onload = function(){
+
 document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
-          
+
 ctx = canvas.getContext('2d');
 trackTransforms(ctx);
 
@@ -67,7 +67,7 @@ canvas.addEventListener('click',function(evt)
 {
   if(canvas.started) {
       var pt = this.getPosition(evt);
-    
+
       if(canvas.state == "drawPoint") {
           zone.addPoint(pt);
       } else if(canvas.state == "drawSegment") {
@@ -85,7 +85,7 @@ canvas.addEventListener('click',function(evt)
       } else if(canvas.state == "addPointOnCurve") {
           zone.addPointCurve(pt);
       }
-    
+
      this.redraw();
   }
 },false);
@@ -122,7 +122,7 @@ canvas.addEventListener('mouseup',function(evt)
     if(this.state == "move") {
         zone.dragStart = null;
     }
-    
+
     if(this.state == "movePoint" || this.state == "movePointSegment" || this.state == "movePointCurve") {
         zone.draggedPoint = null;
     }
@@ -187,10 +187,10 @@ canvas.getPosition = function(evt) {
 //===========================================================================
 
 /**
- * Draw circle in canvas 
+ * Draw circle in canvas
  **/
 canvas.drawCoordinates = function (x,y) {
-    ctx.fillStyle = momacs_config.color_point; 
+    ctx.fillStyle = momacs_config.color_point;
     ctx.beginPath(); //Start path
     ctx.arc(x, y, momacs_config.size_point, 0, Math.PI * 2, true); // Draw a point using the arc function of the canvas with a point structure.
     ctx.fill(); // Close the path and fill.
@@ -212,7 +212,7 @@ canvas.drawText = function(value, x, y) {
 //===========================================================================
 
 /**
- * Draw line in canvas 
+ * Draw line in canvas
  **/
 canvas.drawLine = function (p1, p2) {
     ctx.beginPath();
@@ -233,7 +233,7 @@ canvas.drawBezier = function (id, points) {
    if(points.length == 0) {
      return;
    }
-   
+
    var pts = [];
    for (var i = 0; i < points.length; i++) {
      pts.push(points[i].x);
@@ -283,7 +283,7 @@ canvas.addEventListener('DOMMouseScroll',handleScroll,false);
 canvas.addEventListener('mousewheel',handleScroll,false);
 
 //===========================================================================
-      
+
 /**
  * Event when type of curve change
  **/
@@ -293,7 +293,7 @@ $('input[type=radio][name=typeCurve]').change(function () {
         canvas.redraw();
     }
 });
-    
+
 //===========================================================================
 
 /**
@@ -325,7 +325,7 @@ var eventClickButtonChange = function(name, mode, action) {
   $(name).addClass("btn-success");
   if(mode == action) {
     $(name).addClass("btn-danger");
-    $(name).removeClass("btn-success"); 
+    $(name).removeClass("btn-success");
   }
 }
 
@@ -388,8 +388,8 @@ $("#buttonAddPointOnCurve").click(function(e){ canvas.actionChangeMode("addPoint
 //===========================================================================
 
 /**
- * Add new option in correct select 
- * @param element : html select 
+ * Add new option in correct select
+ * @param element : html select
  **/
 canvas.addOptionToList = function (element, text) {
     var option = document.createElement("option");
@@ -403,7 +403,7 @@ canvas.addOptionToList = function (element, text) {
 
 /**
  * Remove all options in select
- * @param element : html select 
+ * @param element : html select
  **/
 canvas.rezetOptionList = function(element) {
     while (element.firstChild) {
@@ -414,7 +414,7 @@ canvas.rezetOptionList = function(element) {
 //===========================================================================
 
 /**
- * Create new env, rezet zone and rezet all select 
+ * Create new env, rezet zone and rezet all select
  **/
 canvas.newEnv = function() {
     zone.rezet();
@@ -432,7 +432,7 @@ canvas.newEnv = function() {
 //===========================================================================
 
 /**
- * Event when use clear all canvas button 
+ * Event when use clear all canvas button
  **/
 $("#clearImage").click(function(e){
     if(canvas.started) {
@@ -445,7 +445,7 @@ $("#clearImage").click(function(e){
 //===========================================================================
 
 /**
- * Event when use clear current point partition button 
+ * Event when use clear current point partition button
  **/
 $("#buttonClearPartitionPoint").click(function(e){
   zone.clearPointPartition();
@@ -473,7 +473,7 @@ $("#buttonClearPartitionCurve").click(function(e){
 
 /**
  * Event when use new point partition button
- **/ 
+ **/
 $("#buttonNewPartitionPoint").click(function(e){
   zone.newPointPartition();
 });
@@ -482,7 +482,7 @@ $("#buttonNewPartitionPoint").click(function(e){
 
 /**
  * Event when use new segment partition button
- **/ 
+ **/
 $("#buttonNewPartitionSegment").click(function(e){
   zone.newSegmentPartition();
 });
@@ -491,7 +491,7 @@ $("#buttonNewPartitionSegment").click(function(e){
 
 /**
  * Event when use new curve partition button
- **/ 
+ **/
 $("#buttonNewPartitionCurve").click(function(e){
   zone.newCurvePartition();
 });
@@ -500,7 +500,7 @@ $("#buttonNewPartitionCurve").click(function(e){
 
 /**
  * Event when use delete point partition button
- **/ 
+ **/
 $("#buttonDeletePartitionPoint").click(function(e){
   zone.deletePointPartition();
 });
@@ -509,7 +509,7 @@ $("#buttonDeletePartitionPoint").click(function(e){
 
 /**
  * Event when use delete segment partition button
- **/ 
+ **/
 $("#buttonDeletePartitionSegment").click(function(e){
   zone.deleteSegmentPartition();
 });
@@ -518,7 +518,7 @@ $("#buttonDeletePartitionSegment").click(function(e){
 
 /**
  * Event when use delete curve partition button
- **/ 
+ **/
 $("#buttonDeletePartitionCurve").click(function(e){
   zone.deleteCurvePartition();
 });
@@ -527,7 +527,7 @@ $("#buttonDeletePartitionCurve").click(function(e){
 
 /**
  * Event when change current point partition
- **/ 
+ **/
 $( "#selectedPartitionPoint" ).change(function() {
     zone.cidPoint = $('#selectedPartitionPoint').find(":selected").text().substring(1);
 });
@@ -570,7 +570,7 @@ function trackTransforms(ctx){
           savedTransforms.push(xform.translate(0,0));
           return save.call(ctx);
       };
-    
+
       var restore = ctx.restore;
       ctx.restore = function(){
         xform = savedTransforms.pop();
@@ -582,19 +582,19 @@ function trackTransforms(ctx){
         xform = xform.scaleNonUniform(sx,sy);
         return scale.call(ctx,sx,sy);
 		  };
-    
+
       var rotate = ctx.rotate;
       ctx.rotate = function(radians){
           xform = xform.rotate(radians*180/Math.PI);
           return rotate.call(ctx,radians);
       };
-    
+
       var translate = ctx.translate;
       ctx.translate = function(dx,dy){
           xform = xform.translate(dx,dy);
           return translate.call(ctx,dx,dy);
       };
-    
+
       var transform = ctx.transform;
       ctx.transform = function(a,b,c,d,e,f){
           var m2 = svg.createSVGMatrix();
@@ -602,7 +602,7 @@ function trackTransforms(ctx){
           xform = xform.multiply(m2);
           return transform.call(ctx,a,b,c,d,e,f);
       };
-    
+
       var setTransform = ctx.setTransform;
       ctx.setTransform = function(a,b,c,d,e,f){
           xform.a = a;
@@ -613,7 +613,7 @@ function trackTransforms(ctx){
           xform.f = f;
           return setTransform.call(ctx,a,b,c,d,e,f);
       };
-    
+
       var pt  = svg.createSVGPoint();
       ctx.transformedPoint = function(x,y){
           pt.x=x; pt.y=y;
@@ -626,16 +626,16 @@ function trackTransforms(ctx){
 //===========================================================================
 
 /**
- * Use for load backup image file if existe 
+ * Use for load backup image file if existe
  **/
 canvas.loadCanvas = function (dataimage) {
-  
+
   canvas.newEnv();
-  
+
   var PP = dataimage.result.MultiPoints;
   var px = document.getElementById("selectedPartitionPoint");
   this.rezetOptionList(px);
-  
+
   for (var i = 0; i < PP.length; i++) {
     var ptp = PP[i];
     var partition = new Partition(i);
@@ -647,17 +647,17 @@ canvas.loadCanvas = function (dataimage) {
     zone.cidPoint = i;
     this.addOptionToList(px, "P"+i);
   }
-  
+
   if(PP.length == 0) {
     zone.pointsPartition[i] = new Partition(0);
     zone.cidPoint = 0;
     this.addOptionToList(px, "P0");
   }
-  
+
   var MLS = dataimage.result.MultiLineString;
   var sx = document.getElementById("selectedPartitionSegment");
   this.rezetOptionList(sx);
-  
+
   var cx = document.getElementById("selectedPartitionCurve");
   this.rezetOptionList(cx);
 
@@ -669,12 +669,12 @@ canvas.loadCanvas = function (dataimage) {
        //segments MultiLineString
        ptp = ptp[0];
        var partition = new SegmentPartition(indexSP);
-      
+
        for (var j = 0; j < ptp.length; j++) {
          var points = ptp[j];
          partition.addNewPoint(points[0], points[1]);
        }
-       
+
         zone.segmentsPartition[indexSP] = partition;
         zone.cidSegment = indexSP;
         this.addOptionToList(sx, "S"+indexSP);
@@ -691,9 +691,9 @@ canvas.loadCanvas = function (dataimage) {
        this.addOptionToList(cx, "C"+indexCP);
        indexCP++;
     }
-    
+
   }
-  
+
   var MP = dataimage.result.MultiPolygon;
   for (var i = 0; i < MP.length; i++) {
     var ptp = MP[i];
@@ -706,9 +706,9 @@ canvas.loadCanvas = function (dataimage) {
          var points = ptp[j];
          partition.addNewPoint(points[0], points[1]);
        }
-       
+
        partition.content[partition.content.length-1].p2 = partition.content[0].p1;
-      
+
         zone.segmentsPartition[indexSP] = partition;
         zone.cidSegment = indexSP;
         this.addOptionToList(sx, "S"+indexSP);
@@ -725,15 +725,15 @@ canvas.loadCanvas = function (dataimage) {
        this.addOptionToList(cx, "C"+indexCP);
        indexCP++;
     }
-    
+
   }
-  
+
   if(indexSP == 0) {
     zone.segmentsPartition[i] = new SegmentPartition(0);
     zone.cidSegment = 0;
     this.addOptionToList(sx, "S0");
   }
-  
+
     if(indexCP == 0) {
     zone.curvesPartition[i] = new Curve2D(0);
     zone.cidCurve = 0;
@@ -766,7 +766,7 @@ function drawImage(path) {
 //===========================================================================
 
 /**
- * For round with 3 digits after 
+ * For round with 3 digits after
  * @return double
  **/
 function round3(number) {
@@ -777,13 +777,13 @@ function round3(number) {
 //===========================================================================
 
 /**
- * Object Point2D  
+ * Object Point2D
  **/
 var Point2D = function (x,y) {
   this.x = x;
   this.y = y;
   this.printed = true;
-  
+
   /**
    * Draw Point2D on canvas
    **/
@@ -791,7 +791,7 @@ var Point2D = function (x,y) {
     canvas.drawCoordinates(this.x, this.y);
     canvas.drawText(value, this.x, this.y);
   }
-  
+
   /**
    * Check if two Point2D are equal
    * @return boolean
@@ -804,7 +804,7 @@ var Point2D = function (x,y) {
     }
     return false;
   }
-  
+
   /**
    * Get the distance with other Point2D
    * @param p2 : Point2D
@@ -813,7 +813,7 @@ var Point2D = function (x,y) {
   this.distance = function (p2) {
     return Math.sqrt(Math.pow(p2.x - this.x, 2) + Math.pow(p2.y - this.y, 2));
   }
-  
+
   /**
    * Get a new Point2D in the middle of this and p2
    * @param p2 : Point2D
@@ -825,7 +825,7 @@ var Point2D = function (x,y) {
     var p = new Point2D(nx, ny);
     return p;
   }
-  
+
   /**
    * Get mom value
    * @return string
@@ -833,7 +833,7 @@ var Point2D = function (x,y) {
   this.toMOM = function() {
       return round3(this.x) + " " + round3(this.y);
   }
-  
+
   /**
    * Get yml value
    * @return string
@@ -852,7 +852,7 @@ var Point2D = function (x,y) {
 var Segment2D = function (p1, p2) {
   this.p1 = p1;
   this.p2 = p2;
-  
+
   /**
    * Draw segment on canvas without the label on point
    **/
@@ -861,7 +861,7 @@ var Segment2D = function (p1, p2) {
     canvas.drawCoordinates(this.p2.x, this.p2.y);
     canvas.drawLine(this.p1, this.p2);
   }
-  
+
   /**
    * Check if two Segment2D are equal
    * @return boolean
@@ -872,14 +872,14 @@ var Segment2D = function (p1, p2) {
           return true;
       }
     }
-    
+
     if(this.p1.equal(segment.p2)) {
       if(this.p2.equal(segment.p1)) {
           return true;
       }
     }
-   
-    return false; 
+
+    return false;
   }
 }
 
@@ -893,19 +893,19 @@ var Curve2D = function (id) {
    this.id = id;
    // array of Point2D
    this.points = [];
-   // array of all points generate for draw curve 
-   this.allpts = null; 
+   // array of all points generate for draw curve
+   this.allpts = null;
    // if alive equal false we need destroy this partition
    this.alive = true;
-   
+
    /**
     * Get if curve is empty
     * @return boolean
-    **/ 
+    **/
    this.notEmpty = function() {
      return this.size() != 0;
    }
-   
+
    /**
     * Add new Point2D on curve
     * @param x : double
@@ -915,7 +915,7 @@ var Curve2D = function (id) {
       var point = new Point2D(x, y);
       this.points.push(point);
    }
-   
+
    /**
     * Get the size of the curve
     * @return int
@@ -923,14 +923,14 @@ var Curve2D = function (id) {
    this.size = function() {
      return this.points.length;
    }
-   
+
    /**
-    * Move point on curve 
+    * Move point on curve
     * @param x : double
     * @param y : double
     **/
    this.movePoint = function(x, y) {
-      var position = new Point2D(x, y); 
+      var position = new Point2D(x, y);
       for (var j = 0; j < this.size(); j++) {
           if(position.distance(this.points[j]) <= canvas.pointSize) {
               zone.draggedPoint = this.points[j];
@@ -938,7 +938,7 @@ var Curve2D = function (id) {
           }
       }
    }
-   
+
    /**
     * Remove point on curve
     * @param x : double
@@ -960,21 +960,21 @@ var Curve2D = function (id) {
           }
        }
    }
-   
+
   /**
    * Get yml value
    * @return string
    **/
    this.toYML = function() {
      var txt = "";
-     
+
      if(this.size() > 0) {
         txt = "[[";
-      
+
           for (var j = 0; j < this.size(); j++) {
              var p = this.points[j];
 
-             
+
              if(j < this.size()-1) {
                txt = txt + p.toYML() + ", ";
              } else {
@@ -982,7 +982,7 @@ var Curve2D = function (id) {
              }
            }
         txt = txt + "],[";
-        
+
         for (var k = 0; k < this.allpts.length; k++) {
           var p = this.allpts[k];
             if(k < this.allpts.length - 1) {
@@ -991,15 +991,15 @@ var Curve2D = function (id) {
               txt = txt + round3(p);
             }
         }
-      
+
          txt = txt + "]]";
      } else {
 
      }
-     
+
      return txt;
    }
-   
+
   /**
    * Get mom value
    * @return string
@@ -1010,17 +1010,17 @@ var Curve2D = function (id) {
       if(this.size() > 0) {
           if(canvas.typeofcurve == "open") {
             txt ="#LineString\n";
-          } else { 
+          } else {
             txt = "#Polygon\n";
           }
-  
+
           for (var j = 0; j < this.size(); j++) {
             txt = txt + this.points[j].toMOM() + "\n";
           }
-         
+
           if(canvas.typeofcurve == "open") {
             txt = txt + "#LineString_all\n";
-          } else { 
+          } else {
             txt = txt + "#Polygon_all\n";
           }
 
@@ -1036,7 +1036,7 @@ var Curve2D = function (id) {
               index++;
           }
        }
-       
+
       return txt;
    }
 }
@@ -1047,15 +1047,15 @@ var Curve2D = function (id) {
  * Object SegmentPartition
  **/
 var SegmentPartition = function(id) {
-   // the identifiant 
+   // the identifiant
    this.id = id;
    // arrays of Segment2D
    this.content = [];
    //if first segment is complete (with 2 points)
    this.firstSegment = true;
-   // if alive equal false we need destroy this partition 
+   // if alive equal false we need destroy this partition
    this.alive = true;
-   
+
    /**
     * Add new segment to partition
     * @param segment : Segment2D
@@ -1063,7 +1063,7 @@ var SegmentPartition = function(id) {
    this.add = function(segment) {
      this.content.push(segment);
    }
-   
+
    /**
     * Add new segment to partition
     * @param p1 : Point2D
@@ -1073,7 +1073,7 @@ var SegmentPartition = function(id) {
      var segment = new Segment2D(p1, p2);
      this.content.push(segment);
    }
-   
+
    /**
     * Add new segment to partition
     * @param x : double
@@ -1093,14 +1093,14 @@ var SegmentPartition = function(id) {
         this.addNewSegment(last, point);
       }
    }
-   
+
    /**
-    * Move point on curve 
+    * Move point on curve
     * @param x : double
     * @param y : double
     **/
    this.movePoint = function(x, y) {
-      var position = new Point2D(x, y); 
+      var position = new Point2D(x, y);
       for (var j = 0; j < this.size(); j++) {
           if(position.distance(this.content[j].p1) <= canvas.pointSize) {
               zone.draggedPoint = this.content[j].p1;
@@ -1111,45 +1111,45 @@ var SegmentPartition = function(id) {
           }
       }
    }
-   
+
    /**
     * Get if partition is empty
     * @return boolean
-    **/ 
+    **/
    this.notEmpty = function() {
      return this.size() != 0;
    }
-   
+
    /**
     * Draw the segment partition on canvas
     **/
    this.draw = function() {
          var index = 0;
-    
+
         for (var j = 0; j < this.size(); j++) {
             this.content[j].p1.printed = true;
             if(this.content[j].p2) {
               this.content[j].p2.printed = true;
             }
         }
-                  
+
         for (var j = 0; j < this.size(); j++) {
             var p1 = this.content[j].p1;
             var p2 = this.content[j].p2;
             var value = "S"+this.id+"-";
-                      
+
             if(p2) {
                 this.content[j].draw();
-                         
+
                 if(j == 0) {
                     if(p1.printed) {
                       canvas.drawText(value+index, p1.x, p1.y);
                       index++;
                       p1.printed = false;
                     }
-                    
-                } 
-                           
+
+                }
+
                 if(j == this.size() - 1) { //last element
                     if(!p2.equal(this.content[j].p1)) {
                         if(p2.printed) {
@@ -1157,7 +1157,7 @@ var SegmentPartition = function(id) {
                            index++;
                            p2.printed = false;
                         }
-                       
+
                     }
                 } else {
                    if(p2.printed) {
@@ -1165,7 +1165,7 @@ var SegmentPartition = function(id) {
                      index++;
                      p2.printed = false;
                    }
-                   
+
                 }
              } else {
                 if(p1.printed) {
@@ -1174,11 +1174,11 @@ var SegmentPartition = function(id) {
                    index++;
                    p1.printed = false;
                 }
-                 
+
              }
         }
    }
-   
+
    /**
     * Remove segment on partition
     * @param x : double
@@ -1191,13 +1191,13 @@ var SegmentPartition = function(id) {
           var pToDelete = 0;
           var ns = [];
           this.firstSegment = false;
-                  
+
            if(position.distance(segment.p1) <= canvas.pointSize) {
               pToDelete = 1;
            } else if(position.distance(segment.p2) <= canvas.pointSize) {
               pToDelete = 2;
            }
-           
+
            if(j == 0 && pToDelete == 1) { //cas particulier de 1er
                console.log("first");
               for (var k = 1; k < this.size(); k++) {
@@ -1228,7 +1228,7 @@ var SegmentPartition = function(id) {
                   ns.push(newss);
                 } else {
                   if(j+1 == k) {
-                    //nothing to do                         
+                    //nothing to do
                   } else {
                     ns.push(this.content[k]);
                   }
@@ -1242,30 +1242,30 @@ var SegmentPartition = function(id) {
             }
           }
    }
-  
+
   /**
    * Get the size of partition
    **/
    this.size = function() {
      return this.content.length;
    }
-   
+
   /**
    * Get yml value
    * @return string
    **/
    this.toYML = function() {
      var txt = "";
-     
+
      if(this.size() > 0) {
         txt = "[[";
-      
+
           for (var j = 0; j < this.size(); j++) {
              var s = this.content[j];
              if(j == 0) {
                txt = txt + s.p1.toYML() + ", ";
-             } 
-             
+             }
+
              if(j < this.size()-1) {
                txt = txt + s.p2.toYML() + ", ";
              } else {
@@ -1274,17 +1274,17 @@ var SegmentPartition = function(id) {
            }
         txt = txt + "]]";
      }
-     
+
      return txt;
    }
-  
+
   /**
    * Get mom value
    * @return string
    **/
    this.toMOM = function() {
       var txt = "";
-     
+
        if(this.size() > 0) {
         txt = "#LineString";
 
@@ -1293,7 +1293,7 @@ var SegmentPartition = function(id) {
         }
 
         txt = txt + "\n";
-        
+
            for (var j = 0; j < this.size(); j++) {
              var s = this.content[j];
              if(j == 0) {
@@ -1302,10 +1302,10 @@ var SegmentPartition = function(id) {
              txt = txt + s.p2.toMOM() + "\n";
            }
       }
-  
+
       return txt;
    }
-   
+
    /**
     * Check if partition is linestring
     * @return boolean
@@ -1314,17 +1314,17 @@ var SegmentPartition = function(id) {
       if(this.size() < 1) {
         return false;
       }
-    
+
       if(this.size() == 1) {
         return true;
       }
-    
+
       var firstP = this.content[0].p1;
       var lastP = this.content[this.size()-1].p2;
-    
+
       return !firstP.equal(lastP);
    }
-   
+
    /**
     * Check if partition is polygon
     * @return boolean
@@ -1334,10 +1334,10 @@ var SegmentPartition = function(id) {
       if(this.size() < 2) {
         return false;
       }
-      
+
       var firstP = this.content[0].p1;
       var lastP = this.content[this.size()-1].p2;
-    
+
       return firstP.equal(lastP);
    }
 }
@@ -1348,13 +1348,13 @@ var SegmentPartition = function(id) {
  * Object Partition
  **/
 var Partition = function (id) {
-   // the identifiant 
+   // the identifiant
    this.id = id;
    // array of Point2D
    this.content = [];
-   // if alive equal false we need destroy this partition 
+   // if alive equal false we need destroy this partition
    this.alive = true;
-   
+
    /**
     * Add new point on partition
     * @param x : double
@@ -1364,7 +1364,7 @@ var Partition = function (id) {
       var point = new Point2D(x, y);
       this.content.push(point);
    }
- 
+
    /**
     * Add new point on partition
     * @param point : Point2D
@@ -1372,14 +1372,14 @@ var Partition = function (id) {
    this.add = function(point) {
      this.content.push(point);
    }
-   
+
    /**
     * Get the size of partition
     **/
    this.size = function() {
      return this.content.length;
    }
-   
+
    /**
     * Draw the partition on canvas
     **/
@@ -1388,17 +1388,17 @@ var Partition = function (id) {
         this.content[j].draw("P"+this.id+"-"+j);
       }
    }
-   
+
    /**
     * Get if partition is empty
     * @return boolean
-    **/ 
+    **/
    this.notEmpty = function() {
      return this.size() != 0;
    }
-   
+
    /**
-    * Move point on partition 
+    * Move point on partition
     * @param x : double
     * @param y : double
     **/
@@ -1412,9 +1412,9 @@ var Partition = function (id) {
           }
       }
    }
-  
+
    /**
-    * Remove point on partition 
+    * Remove point on partition
     * @param x : double
     * @param y : double
     **/
@@ -1434,17 +1434,17 @@ var Partition = function (id) {
           }
        }
     }
-    
+
     /**
      * Get yml value
      * @return string
      **/
     this.toYML = function() {
       var txt = "";
-  
+
       if(this.size() > 0) {
         txt = '[';
-    
+
         if(this.size() == 1) {
           txt = txt, this.content[0].toYML() + ']';
         } else {
@@ -1457,25 +1457,25 @@ var Partition = function (id) {
 
       return txt;
     }
-    
+
     /**
      * Get mom value
      * @return string
      **/
     this.toMOM = function() {
        var txt = "";
-       
+
        if(this.size() > 0) {
          txt = "#MultiPoint" + "\n";
-         
+
          for (var j = 0; j < this.size()-1; j++) {
              txt = txt + this.content[j].toMOM()+ "\n";
          }
        }
-    
+
        return txt;
     }
-  
+
 }
 
 //===========================================================================
@@ -1484,50 +1484,50 @@ var Partition = function (id) {
  * Object ZoneP
  **/
 var ZoneP = function () {
-  
+
   // current id of point partition
   this.cidPoint = 0;
-  
+
   // current id of segment partition
   this.cidSegment = 0;
-  
+
   // current id of curve partition
   this.cidCurve = 0;
-  
-  // array of point partition  
+
+  // array of point partition
   this.pointsPartition = [];
-  
+
   // array of segment partition
   this.segmentsPartition = [];
-  
+
   // array of curve partition
   this.curvesPartition = [];
-  
+
   // the starting point of the movement
   this.dragStart = null;
-  
+
   // the point to move in movement
   this.draggedPoint = null;
-  
-  // when use button point on segment is the first point 
+
+  // when use button point on segment is the first point
   this.newA = null;
-  // when use button point on segment is the second point 
+  // when use button point on segment is the second point
   this.newB = null;
-  
-  // when use button point on curve is the first point 
+
+  // when use button point on curve is the first point
   this.newCA = null;
-  // when use button point on curve is the second point 
+  // when use button point on curve is the second point
   this.newCB = null;
-  
+
   // collection point partition
   this.pointsPartition[0] = new Partition(0);
-  
+
   // collection segment partition
   this.segmentsPartition[0] = new SegmentPartition(0);
-  
+
   // collection curve partition
   this.curvesPartition[0] = new Curve2D(0);
-  
+
   /**
    * For reset all partition
    **/
@@ -1535,20 +1535,20 @@ var ZoneP = function () {
     this.pointsPartition = [];
     this.segmentsPartition = [];
     this.curvesPartition = [];
-        
+
     this.pointsPartition[0] = new Partition(0);
     this.segmentsPartition[0] = new SegmentPartition(0);
     this.curvesPartition[0] = new Curve2D(0);
-        
+
     this.cidPoint = 0;
     this.cidSegment = 0;
     this.cidCurve = 0;
-    
+
     this.MOM = "";
     this.YML = "";
-    
+
   }
-  
+
   /**
    * Add point on current point partition
    * @param pt : SVGPoint
@@ -1557,8 +1557,8 @@ var ZoneP = function () {
     if(this.cidPoint != -1) {
       this.pointsPartition[this.cidPoint].addNewPoint(pt.x, pt.y);
     }
-  }           
-  
+  }
+
   /**
    * Add point on current segment partition
    * @param pt : SVGPoint
@@ -1568,7 +1568,7 @@ var ZoneP = function () {
       this.segmentsPartition[this.cidSegment].addNewPoint(pt.x, pt.y);
     }
   }
-  
+
   /**
    * Add point on current curve partition
    * @param pt : SVGPoint
@@ -1578,7 +1578,7 @@ var ZoneP = function () {
       this.curvesPartition[this.cidCurve].addNewPoint(pt.x, pt.y);
     }
   }
-  
+
   /**
    * Delete point on current point partition
    * @param pt : SVGPoint
@@ -1590,7 +1590,7 @@ var ZoneP = function () {
       }
     }
   }
-  
+
   /**
    * Delete point on current segment partition
    * @param pt : SVGPoint
@@ -1602,7 +1602,7 @@ var ZoneP = function () {
       }
     }
   }
-  
+
   /**
    * Delete point on current curve partition
    * @param pt : SVGPoint
@@ -1614,7 +1614,7 @@ var ZoneP = function () {
       }
     }
   }
-  
+
   /**
    * Add new point between two point of current curve partition
    * @param pt : SVGPoint
@@ -1623,10 +1623,10 @@ var ZoneP = function () {
       if(this.cidCurve != -1) {
           var point = new Point2D(pt.x, pt.y);
           var partition = this.curvesPartition[this.cidCurve];
-        
+
           for (var i = 0; i < partition.size(); i++) {
             var p = partition.points[i];
-            
+
               if(this.newCA == null) {
                   if(point.distance(p) <= canvas.pointSize) {
                     this.newCA = p;
@@ -1637,7 +1637,7 @@ var ZoneP = function () {
                   }
               }
           }
-           
+
            if(this.newCA != null && this.newCB != null) {
                 var p = this.newCA.middle(this.newCB);
                 var indexA = 0;
@@ -1651,27 +1651,27 @@ var ZoneP = function () {
                     indexB = j;
                   }
                 }
-                
+
                 var index = Math.min(indexA, indexB);
                 var c = [];
-                
+
                 for (var k = 0; k <= index; k++) {
                   c.push(partition.points[k]);
                 }
-                
+
                 c.push(p);
-                
+
                  for (var k = index+1; k < partition.size(); k++) {
                    c.push(partition.points[k]);
                  }
-                
+
                 partition.points = c;
                 this.newCA = null;
                 this.newCB = null;
            }
       }
   }
-  
+
   /**
    * Add new point between two point of current segment partition
    * @param pt : SVGPoint
@@ -1679,13 +1679,13 @@ var ZoneP = function () {
   this.addPoinSegment = function(pt) {
           if(this.cidSegment != -1) {
             var point = new Point2D(pt.x, pt.y);
-            
+
                 var partition = this.segmentsPartition[this.cidSegment];
                 for (var j = 0; j < partition.size(); j++) {
                     var segment = partition.content[j];
                     var d1 = point.distance(segment.p1);
                     var d2 = point.distance(segment.p2);
-                    
+
                     if(this.newA == null) {
                       if(d1 <= canvas.pointSize) {
                          this.newA = segment.p1;
@@ -1702,11 +1702,11 @@ var ZoneP = function () {
                         }
                     }
                 }
-                
+
                 if(this.newA != null && this.newB == null) {
                     this.newB = point; //segment with new point
                 }
-                
+
                 if(this.newA != null && this.newB != null) {
                     for (var j = 0; j < partition.size(); j++) {
                         var segment = partition.content[j];
@@ -1730,14 +1730,14 @@ var ZoneP = function () {
                             return;
                         }
                     }
-                    
+
                     partition.addNewSegment(this.newA, this.newB);
                     this.newA = null;
                     this.newB = null;
                 }
             }
   }
-  
+
   /**
    * Move point of point partition
    * @param pt : SVGPoint
@@ -1747,7 +1747,7 @@ var ZoneP = function () {
       this.pointsPartition[i].movePoint(pt.x, pt.y);
     }
   }
-  
+
   /**
    * Move point of segment partition
    * @param pt : SVGPoint
@@ -1757,7 +1757,7 @@ var ZoneP = function () {
       this.segmentsPartition[i].movePoint(pt.x, pt.y);
     }
   }
-  
+
   /**
    * Move point of curve partition
    * @param pt : SVGPoint
@@ -1767,7 +1767,7 @@ var ZoneP = function () {
       this.curvesPartition[i].movePoint(pt.x, pt.y);
     }
   }
-  
+
   /**
    * Draw all point partitions
    **/
@@ -1776,7 +1776,7 @@ var ZoneP = function () {
       this.pointsPartition[i].draw();
     }
   }
-  
+
   /**
    * Draw all segment partitions
    **/
@@ -1785,7 +1785,7 @@ var ZoneP = function () {
       this.segmentsPartition[i].draw();
     }
   }
-  
+
   /**
    * Draw all curve partitions
    **/
@@ -1794,7 +1794,7 @@ var ZoneP = function () {
       canvas.drawBezier(i, this.curvesPartition[i].points);
     }
   }
-  
+
   /**
    * Use for create new point partition
    **/
@@ -1807,7 +1807,7 @@ var ZoneP = function () {
       zone.cidPoint = id;
     }
   }
-  
+
   /**
    * Use for create new point partition
    **/
@@ -1820,7 +1820,7 @@ var ZoneP = function () {
       zone.cidSegment = id;
     }
   }
-  
+
   /**
    * Use for create new curve partition
    **/
@@ -1833,7 +1833,7 @@ var ZoneP = function () {
       zone.cidCurve = id;
     }
   }
-  
+
   /**
    * Use for clear current point partition
    **/
@@ -1844,7 +1844,7 @@ var ZoneP = function () {
           canvas.redraw();
       }
   }
-  
+
   /**
    * Use for clear current segment partition
    **/
@@ -1855,7 +1855,7 @@ var ZoneP = function () {
           canvas.redraw();
       }
   }
-  
+
   /**
    * Use for clear current curve partition
    **/
@@ -1866,7 +1866,7 @@ var ZoneP = function () {
           canvas.redraw();
       }
   }
-  
+
   /**
    * Use for delete current point partition
    **/
@@ -1890,7 +1890,7 @@ var ZoneP = function () {
         }
       }
       zone.pointsPartition = collectionPoint;
-      
+
       zone.cidPoint = -1;
       for (var i = 0; i < zone.pointsPartition.length; i++) {
         if(zone.pointsPartition[i].alive) {
@@ -1898,11 +1898,11 @@ var ZoneP = function () {
           break;
         }
       }
-    
+
       canvas.redraw();
     }
   }
-  
+
   /**
    * Use for delete current segment partition
    **/
@@ -1925,9 +1925,9 @@ var ZoneP = function () {
           j++;
         }
       }
-      
+
       zone.segmentsPartition = collectionSegment;
-  
+
       zone.cidSegment = -1;
       for (var i = 0; i < zone.segmentsPartition.length; i++) {
         if(zone.segmentsPartition[i].alive) {
@@ -1935,11 +1935,11 @@ var ZoneP = function () {
           break;
         }
       }
-  
+
       canvas.redraw();
     }
   }
-  
+
   /**
    * Use for delete current curve partition
    **/
@@ -1963,7 +1963,7 @@ var ZoneP = function () {
         }
       }
       zone.curvesPartition = collectionCurve;
-      
+
       zone.cidCurve = -1;
       for (var i = 0; i < zone.curvesPartition.length; i++) {
         if(zone.curvesPartition[i].alive) {
@@ -1979,28 +1979,28 @@ var ZoneP = function () {
    * Generate the content of mom file
    **/
   this.createMOMFile = function() {
-    
+
     for (var i = 0; i < this.pointsPartition.length; i++) {
       this.MOM += this.pointsPartition[i].toMOM();
     }
-    
+
     for (var i = 0; i < this.segmentsPartition.length; i++) {
       this.MOM += this.segmentsPartition[i].toMOM();
     }
-    
+
     for (var i = 0; i < this.curvesPartition.length; i++) {
       this.MOM += this.curvesPartition[i].toMOM();
     }
-    
+
   }
-  
+
   /**
    * Generate the content of yml file
    **/
   this.createYMLFile = function() {
-    
+
   this.YML += '  MultiPoints: [' + '\n';
-  
+
     if(this.pointsPartition.length == 1) {
        this.YML += this.pointsPartition[0].toYML();
     } else {
@@ -2011,15 +2011,15 @@ var ZoneP = function () {
       }
       this.YML += this.pointsPartition[this.pointsPartition.length - 1].toYML();
     }
-    
-     this.YML += "\n]\n";
-     
-     this.YML += '  MultiLineString: [' + '\n';
-     
-     var indexLine = 0;
-     
 
-        
+     this.YML += "\n]\n";
+
+     this.YML += '  MultiLineString: [' + '\n';
+
+     var indexLine = 0;
+
+
+
         for (var i = 0; i < this.segmentsPartition.length; i++) {
           if(this.segmentsPartition[i].isLineString()) {
             indexLine++;
@@ -2032,9 +2032,9 @@ var ZoneP = function () {
             }
           }
         }
-        
+
          var firstO = true;
-        
+
           if(canvas.typeofcurve == "open") {
             for (var i = 0; i < this.curvesPartition.length; i++) {
               if(i < this.curvesPartition.length - 1) {
@@ -2058,17 +2058,17 @@ var ZoneP = function () {
                   }
                 this.YML += this.curvesPartition[i].toYML() + "\n";
               }
-              
-            }  
+
+            }
           }
-     
-     
+
+
      this.YML += "\n]\n";
-     
+
      this.YML += '  MultiPolygon: [' + '\n';
-     
+
       var indexPoly = 0;
-     
+
         for (var i = 0; i < this.segmentsPartition.length; i++) {
           if(this.segmentsPartition[i].isPolygon()) {
             indexPoly++;
@@ -2081,12 +2081,12 @@ var ZoneP = function () {
             }
           }
         }
-        
+
         var firstC = true;
-        
+
          if(canvas.typeofcurve == "close") {
             for (var i = 0; i < this.curvesPartition.length; i++) {
-            
+
               if(i < this.curvesPartition.length - 1) {
                 if(this.curvesPartition[i].notEmpty()) {
                   if(firstC) {
@@ -2099,7 +2099,7 @@ var ZoneP = function () {
                   this.YML += this.curvesPartition[i].toYML() + ",\n";
                 }
               } else {
-                
+
                  if(firstC) {
                     firstC = false;
                     if(indexPoly > 0) {
@@ -2109,12 +2109,12 @@ var ZoneP = function () {
                   }
                 this.YML += this.curvesPartition[i].toYML() + "\n";
               }
-            }  
+            }
           }
-     
+
      this.YML += "\n]\n";
   }
-  
+
   /**
    * For regenerate mom and yml content
    **/
@@ -2133,9 +2133,9 @@ var ZoneP = function () {
  * When key press on canvas
  **/
 $(document).keypress(function(e){
- 
+
         var key = e.originalEvent.key;
-        
+
         // console.log(key);
 
         if(key == momacs_shortcut.drawPoint) {
@@ -2203,7 +2203,7 @@ $(document).keypress(function(e){
         } else {
           // nothing
         }
-        
+
 });
 
 //===========================================================================

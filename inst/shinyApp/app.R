@@ -1,1 +1,0 @@
-Momacs::go()

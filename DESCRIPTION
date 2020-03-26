@@ -1,6 +1,7 @@
 Package: Momacs
 Version: 0.0.0.9000
-Title: Acquisition of morphometrics data in R
+Title: Interactively acquisition of morphometrics data 
+    such as landmarks, sliding landmarks, curves, and outlines
 Description: What the package does (one paragraph).
 Authors@R: c(person("Vincent", "Bonhomme", , "bonhomme.vincent@gmail.com", c("aut", "cre")),
              person("Jimmy", "Lopez", , "jimmy.lopez@umontpellier.fr", c("aut")))
@@ -11,10 +12,14 @@ BugReports: https://github.com/MomX/Momacs/issues
 LazyData: true
 ByteCompile: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 6.0.1
+RoxygenNote: 7.1.0
 Depends: R (>= 3.4.0)
+Author: Vincent Bonhomme [aut, cre],
+  Jimmy Lopez [aut]
 Imports:
+    colourpicker,
     downloader,
+    httpuv,
     shiny,
     shinyBS,
     shinydashboard,

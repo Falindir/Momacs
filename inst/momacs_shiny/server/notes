@@ -1,0 +1,6 @@
+* Bug de chargement d'image Firefox. Ni chez Chrome, ni chez Safari though.
+* Implement Bézier curves with handlers ie http://blogs.sitepointstatic.com/examples/tech/canvas-curves/bezier-curve.html
+* refresh a bit the yaml, possibly add tags (Momacs)
+* UI overall
+* drag and drop
+* package

@@ -55,6 +55,8 @@ Shiny.addCustomMessageHandler("run",
         canvas.imagePath = path_image;
         drawImage(path_image);
         
+        console.log(path_image);
+        
         // we send loadI event to shiny
         Shiny.onInputChange("loadI", path_image);
      }

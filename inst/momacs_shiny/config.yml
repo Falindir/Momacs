@@ -1,0 +1,13 @@
+setting:
+  color_background: "#515151"
+  color_point: "#00B4FF"
+  color_segment: "#EEEEEE"
+  color_curve: "#00B4FF"
+  color_hover: "#FF7386"
+  color_text: "#FF3D75"
+  size_point: "2"
+  size_hover: "3"
+  size_segment: "2"
+  size_curve: "2"
+  size_text: "10"
+
