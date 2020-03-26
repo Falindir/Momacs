@@ -18,10 +18,3 @@ navbar:
 authors:
   Vincent Bonhomme:
     href: http://www.vincentbonhomme.fr
-
-
-reference:
-  - title: "shiny apps"
-    desc: ""
-    contents:
-      - acquire
