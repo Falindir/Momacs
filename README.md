@@ -37,9 +37,13 @@ Once on CRAN, you can install the released version of Momacs from [CRAN](https:/
 install.packages("Momacs")
 ```
 
-## Example
+So far you can :
 
-This is a basic example which shows you how to solve a common problem:
+``` r
+devtools::install_github("MomX/Momacs")
+```
+
+Then just launch it with:
 
 ``` r
 library(Momacs)
