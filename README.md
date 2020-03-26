@@ -24,7 +24,6 @@ status](https://www.r-pkg.org/badges/version/Momacs)](https://CRAN.R-project.org
 ![CRAN downloads grand
 total](http://cranlogs.r-pkg.org/badges/grand-total/Momacs)
 -->
-[![Codecov test coverage](https://codecov.io/gh/Falindir/Momacs/branch/master/graph/badge.svg)](https://codecov.io/gh/Falindir/Momacs?branch=master)
 <!-- badges: end -->
 
 The goal of Momacs is to interactively acquire morphometrics data such as landmarks, sliding landmarks, curves, and outlines.
