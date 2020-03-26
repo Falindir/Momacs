@@ -3,7 +3,7 @@
 #' Works better in Chrome or Safari than in Firefox and RStudio viewer.
 #'
 #' @return void
-#' @import colourpicker
+# #' @import colourpicker
 #' @import shiny
 #' @import downloader
 #' @import httpuv
@@ -20,5 +20,6 @@
 #' }
 #' @export
 acquire <- function() {
-  shiny::runApp("inst/momacs_shiny/")
+  shiny::runApp("inst/momacs_shiny/",
+                launch.browser=TRUE)
 }

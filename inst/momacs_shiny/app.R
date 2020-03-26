@@ -1,4 +1,3 @@
-#
 # This is a Shiny web application. You can run the application by clicking
 # the 'Run App' button above.
 #
@@ -7,6 +6,7 @@
 #    http://shiny.rstudio.com/
 #
 
+# dependencies -----
 library(httpuv)
 library(downloader)
 library(shiny)
@@ -17,22 +17,23 @@ library(stringr)
 library(shinyFiles)
 library(tools)
 library(shinyBS)
-library(colourpicker)
+# library(colourpicker)
 
-# we load settings of momacs
+# we load Momacs settings
 configs <<- yaml.load_file("config.yml")$setting
 
-# we load shortcut of momacs
+# we load Momacs keyboard shortcuts
 shortcut <<- yaml.load_file("shortcut.yml")$shortcut
 
-# Source menu gauche
+# source left_sidebar
 source("./pages/page_def_home.R",      local = TRUE)
 source("./pages/page_def_shortcut.R",  local = TRUE)
 source("./pages/page_def_cosmetics.R", local = TRUE)
 source("./R/left_sidebar.R",           local = TRUE)
 
-style <- tags$style(HTML(readLines("www/added_styles.css")) )
-UI <- dashboardPage(
+style <- tags$style(HTML(readLines("www/added_styles.css")))
+
+UI    <- dashboardPage(
   skin = "black",
   dashboardHeader(title=paste0("\U0001f6e0", "Momacs"), titleWidth = 140),
   dashboardSidebar(width = 140, LeftSidebar),

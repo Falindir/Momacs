@@ -4,3 +4,5 @@
 * UI overall
 * drag and drop
 * package
+* old NAMESPACE: exportPattern("^[[:alpha:]]+")
+
