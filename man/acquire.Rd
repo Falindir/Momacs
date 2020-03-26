@@ -4,13 +4,16 @@
 \alias{acquire}
 \title{Launches Momacs}
 \usage{
-acquire()
+acquire(launch.browser = TRUE)
+}
+\arguments{
+\item{launch.browser}{\code{logical} whether to launch in a browser (\code{TRUE}) by default)}
 }
 \value{
 void
 }
 \description{
-Works better in Chrome or Safari than in Firefox and RStudio viewer.
+Launches Momacs
 }
 \examples{
 \dontrun{

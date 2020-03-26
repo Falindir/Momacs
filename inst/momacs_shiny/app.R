@@ -35,7 +35,7 @@ style <- tags$style(HTML(readLines("www/added_styles.css")))
 
 UI    <- dashboardPage(
   skin = "black",
-  dashboardHeader(title=paste0("\U0001f6e0", "Momacs"), titleWidth = 140),
+  dashboardHeader(title=paste0("\U0001f6e0", " Momacs"), titleWidth = 140),
   dashboardSidebar(width = 140, LeftSidebar),
   dashboardBody(
     shinyjs::useShinyjs(),

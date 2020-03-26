@@ -1,7 +1,6 @@
 #' Launches Momacs
 #'
-#' Works better in Chrome or Safari than in Firefox and RStudio viewer.
-#'
+#' @param launch.browser `logical` whether to launch in a browser (`TRUE`) by default)
 #' @return void
 # #' @import colourpicker
 #' @import shiny
@@ -19,7 +18,7 @@
 #' acquire()
 #' }
 #' @export
-acquire <- function() {
+acquire <- function(launch.browser=TRUE) {
   shiny::runApp("inst/momacs_shiny/",
-                launch.browser=TRUE)
+                launch.browser=launch.browser)
 }
